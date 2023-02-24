@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const serviceAccount = require("../config/serviceAccount.json");
 const User = require("../models/user");
 var admin = require("firebase-admin");
-
+const mongoose = require("mongoose");
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
@@ -24,7 +24,10 @@ const login = async (req, res) => {
       serviceAccount.private_key
     );
 
-    const userLogin = await User.findOne({ email: googlePayload.email });
+    const userLogin = await User.findOne({
+      email: googlePayload.email,
+      status: true,
+    });
     if (userLogin) {
       const payload = {
         id: userLogin.id,
@@ -35,6 +38,7 @@ const login = async (req, res) => {
         status: userLogin.status,
         roleName: userLogin.roleName,
       };
+      console.log(payload);
       const accessToken = createAccessToken(payload);
       res.status(200).json({
         status: "Success",
@@ -45,19 +49,31 @@ const login = async (req, res) => {
         },
       });
     } else {
-      // checkEmailDomain(googlePayload.email, ["fpt.edu.vn"])
-      //   ? register(req, res)
-      //   : res.status(400).json({
-      //       status: "Fail",
-      //       messages:
-      //         "Please contact your administrator to support your account!",
-      //     });
-      res.status(400).json("err");
+      if (checkEmailDomain(googlePayload.email, ["fpt.edu.vn"])) {
+        register(req, res);
+      } else {
+          debugger
+          const newUser = {
+            fullname: googlePayload.name || "",
+            email: googlePayload.email,
+            img: googlePayload.picture,
+            phoneNumber: googlePayload.phoneNumber || "",
+            status: false,
+          };
+          console.log(googlePayload);
+          await User.insertMany(newUser)
+          res.status(400).json({
+            status: "Fail",
+            messages:
+              "Your email domain is not supported. Please contact your administrator to support your account!",
+          });
+        
+      }
     }
   } catch (err) {
     res.status(500).json({
       status: "Fail",
-      // messages: err.messages,
+      messages: err.message,
     });
   }
 };
@@ -85,7 +101,7 @@ const register = async (req, res) => {
         messages: "Email already exists",
       });
     } else {
-      await User.insertOne(decodeUser).then((user) => {
+      await User.insertMany(decodeUser).then((user) => {
         const payload = {
           fullname: user.fullname,
           email: user.email,
