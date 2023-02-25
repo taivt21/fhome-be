@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const bodyParser = require('body-parser')
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
@@ -20,7 +21,8 @@ setSwaggerUI(app, swaggerUi, swaggerDocument);
 
 // Body parser middleware
 app.use(express.json());
-
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
 // Set up routes
 app.use('/', userRoutes);
 app.use('/', authRoutes);
