@@ -96,3 +96,78 @@ exports.deleteUser = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+//get data theo status false
+exports.getData = async (req, res) => {
+  try {
+    const users = await User.find({ status: false });
+    res.status(200).json({
+      status: "Success",
+      messages: "Get users successfully!",
+      data: {
+        users
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "Fail",
+      messages: err.message,
+    });
+  }
+}
+//set status user thành true
+exports.setUserStatus = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: userId },
+      { status: true, roleName: "landlord" },
+      { new: true } // trả về user sau khi đã update
+    );
+    if (!updatedUser || !updatedUser.status) {
+      return res.status(404).json({
+        status: "Fail",
+        messages: "User not found or status is not true",
+      });
+    }
+    res.status(200).json({
+      status: "Success",
+      messages: "User status updated successfully!",
+      data: {
+        user: updatedUser
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "Fail",
+      messages: err.message,
+    });
+  }
+};
+//delete User theo id
+exports.deleteUser = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const deletedUser = await User.findByIdAndDelete(userId);
+
+    if (!deletedUser) {
+      return res.status(404).json({
+        status: "Fail",
+        messages: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      status: "Success",
+      messages: "User deleted successfully!",
+      data: {
+        // user: deletedUser,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "Fail",
+      messages: err.message,
+    });
+  }
+};
+
