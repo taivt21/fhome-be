@@ -18,4 +18,11 @@ router.put('/users/:id', authorize(['admin', 'landlord']), userController.update
 // Xóa người dùng
 router.delete('/users/:id', authorize(['admin']), userController.deleteUser);
 
+router.get("/getUser",userController.getData)
+//http://localhost:3000/getUser
+router.put("/setUserStatus/:userId", userController.setUserStatus);
+//example http://localhost:3000/setUserStatus/63fc61ef617136555e017603
+router.delete("/deleteUser/:userId",userController.deleteUser)
+//example http://localhost:3000/deleteUser/63fc6149d0db61d24a614b62
+
 module.exports = router;

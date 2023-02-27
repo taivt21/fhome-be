@@ -86,10 +86,10 @@ const register = async (req, res) => {
     );
 
     const decodeUser = {
-      fullname: googlePayload.fullname,
+      fullname: googlePayload.name || " ",
       email: googlePayload.email,
-      img: googlePayload.img,
-      phoneNumber: googlePayload.phoneNumber,
+      img: googlePayload.picture,
+      phoneNumber: googlePayload.phoneNumber ||" ",
       status: true,
     };
 
@@ -128,82 +128,8 @@ const register = async (req, res) => {
     });
   }
 };
-const getData = async (req, res) => {
-  try {
-    const users = await User.find({ status: false });
-    res.status(200).json({
-      status: "Success",
-      messages: "Get users successfully!",
-      data: {
-        users
-      },
-    });
-  } catch (err) {
-    res.status(500).json({
-      status: "Fail",
-      messages: err.message,
-    });
-  }
-}
-const setUserStatus = async (req, res) => {
-  try {
-    const userId = req.params.userId;
-    const updatedUser = await User.findOneAndUpdate(
-      { _id: userId },
-      { status: true},
-      { new: true } // trả về user sau khi đã update
-    );
-    if (!updatedUser || !updatedUser.status) {
-      return res.status(404).json({
-        status: "Fail",
-        messages: "User not found or status is not true",
-      });
-    }
-    res.status(200).json({
-      status: "Success",
-      messages: "User status updated successfully!",
-      data: {
-        user: updatedUser
-      },
-    });
-  } catch (err) {
-    res.status(500).json({
-      status: "Fail",
-      messages: err.message,
-    });
-  }
-};
-const deleteUser = async (req, res) => {
-  try {
-    const userId = req.params.userId;
-    const deletedUser = await User.findByIdAndDelete(userId);
-
-    if (!deletedUser) {
-      return res.status(404).json({
-        status: "Fail",
-        messages: "User not found",
-      });
-    }
-
-    res.status(200).json({
-      status: "Success",
-      messages: "User deleted successfully!",
-      data: {
-        user: deletedUser,
-      },
-    });
-  } catch (err) {
-    res.status(500).json({
-      status: "Fail",
-      messages: err.message,
-    });
-  }
-};
 
 module.exports = {
   login,
   register,
-  getData,
-  setUserStatus,
-  deleteUser
 };
