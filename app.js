@@ -5,7 +5,7 @@ const cors = require('cors');
 // Import routes
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
-
+const postingRoutes = require('./routes/postingRoutes')
 // Import middlewares
 const authenticate = require('./middlewares/authenticate');
 const authorize = require('./middlewares/authorize');
@@ -26,6 +26,7 @@ app.use(bodyParser.json())
 // Set up routes
 app.use('/', userRoutes);
 app.use('/', authRoutes);
+app.use('/',postingRoutes)
 app.use(cors());
 
 // đối với tên miền hoặc cổng cụ thể
