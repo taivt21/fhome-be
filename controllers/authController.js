@@ -58,6 +58,7 @@ const login = async (req, res) => {
             email: googlePayload.email,
             img: googlePayload.picture,
             phoneNumber: googlePayload.phoneNumber || "",
+            roleName:"landlord",
             status: false,
           };
           console.log(googlePayload);
@@ -108,7 +109,7 @@ const register = async (req, res) => {
           phoneNumber: user.phoneNumber,
           img: user.img,
           status: user.status,
-          roleName: "fptmember",
+          roleName: "landlord",
         };
         const accessToken = createAccessToken(payload);
         res.status(200).json({

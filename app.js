@@ -17,7 +17,7 @@ const swaggerDocument = require('./swagger.json');
 const setSwaggerUI = require('./utils/swagger');
 
 // Call setSwaggerUI to set up Swagger UI
-setSwaggerUI(app, swaggerUi, swaggerDocument);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Body parser middleware
 app.use(express.json());
