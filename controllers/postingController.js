@@ -40,6 +40,90 @@ const createPosting = async (req, res) => {
     }
 };
 
+const getAllPostings = async (req, res) => {
+    try {
+        const postings = await Posting.find();
+        res.status(200).json({
+            status: "Success",
+            messages: "Get posts successfully!",
+            data: { postings },
+        });
+    } catch (err) {
+        res.status(500).json({
+            status: "Fail",
+            messages: err.message,
+        });
+    }
+}
+
+const getPostingById = async (req, res) => {
+    try {
+        const posting = await Posting.findById(req.params.postingId);
+        res.status(200).json({
+            status: "Success",
+            messages: "Get post successfully!",
+            data: { posting },
+        });
+    } catch (err) {
+        res.status(500).json({
+            status: "Fail",
+            messages: err.message,
+        });
+    }
+}
+
+const updatePosting = async (req, res) => {
+    try {
+        const posting = await Posting.findById(req.params.postingId);
+        if (!posting) {
+            return res.status(404).json({ message: "Post not found" });
+        }
+
+        if (req.body.title) {
+            posting.title = req.body.title;
+        }
+
+        if (req.body.description) {
+            posting.description = req.body.description;
+        }
+
+        if (req.body.buildings) {
+            posting.buildings = req.body.buildings;
+        }
+
+        if (req.body.roomTypes) {
+            posting.roomTypes = req.body.roomTypes;
+        }
+
+        if (req.body.userPosting) {
+            posting.userPosting = req.body.userPosting;
+        }
+
+        if (req.body.img) {
+            posting.img = req.body.img;
+        }
+
+        const updatedPosting = await posting.save();
+        res.status(200).json(updatedPosting);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+}
+
+const deletePosting = async (req, res) => {
+    try {
+        const posting = await Posting.findById(req.params.postingId);
+        if (!posting) {
+            return res.status(404).json({ message: "Post not found" });
+        }
+
+        posting.status = "inactive";
+        const updatedPosting = await posting.save();
+        res.status(200).json(updatedPosting);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+}
 module.exports={
-createPosting
+createPosting, getAllPostings, getPostingById, updatePosting, deletePosting
 }
