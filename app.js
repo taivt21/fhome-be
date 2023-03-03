@@ -17,7 +17,7 @@ const swaggerDocument = require('./swagger.json');
 const setSwaggerUI = require('./utils/swagger');
 
 // Call setSwaggerUI to set up Swagger UI
-setSwaggerUI(app, swaggerUi, swaggerDocument);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Body parser middleware
 app.use(express.json());
@@ -26,13 +26,15 @@ app.use(bodyParser.json())
 // Set up routes
 app.use('/', userRoutes);
 app.use('/', authRoutes);
-app.use('/', postingRoutes)
+app.use('/',postingRoutes)
 
-app.use(cors());
-app.options('*', cors());
-app.use(cors({
-  credentials: true,
-}));
+app.use(function(req, res, next){
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Authorization");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+  next();
+})
+// app.use(cors());
 
 
 

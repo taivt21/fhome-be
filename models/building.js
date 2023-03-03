@@ -4,11 +4,10 @@ const buildingSchema = new mongoose.Schema(
     {
         buildingName: { type: String },
         address: { type: String },
-        rooms: { type: mongoose.Schema.Types.ObjectId, ref: "Room" },
     },
     { timestamps: true }
 );
 
-const Building = mongoose.model("Building", buildingSchema);
+const Buildings = mongoose.model("Buildings", buildingSchema);
 
-module.exports = Building;
+module.exports = Buildings;

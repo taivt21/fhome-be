@@ -1,6 +1,7 @@
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 
+
 const options = {
   definition: {
     openapi: '3.0.0',
@@ -15,25 +16,11 @@ const options = {
       },
     ],
   },
-  apis: ['./routes/*.js'],
+  apis: ['../routes/userRoutes.js'],
 };
-// const setSwaggerUI = (app, swaggerUi, swaggerDocument) => {
-//   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-// };
-
-// module.exports = {
-//   setSwaggerUI,
-// };
 
 const specs = swaggerJsdoc(options);
 
 module.exports = app => {
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 }
-
-// module.exports = {
-//   setSwaggerUI: (app, swaggerUi, swaggerDocument) => {
-//     app.use('/api-docs', swaggerUi.serve);
-//     app.get('/api-docs', swaggerUi.setup(swaggerDocument));
-//   },
-// };
