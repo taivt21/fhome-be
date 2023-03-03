@@ -1,11 +1,13 @@
 
-const admin = require("../config");
+const admin = require("../config/serviceAccount.json");
 
-const authenticate = async (req, res, next) => {
+exports.authenticate = async (req, res, next) => {
   try {
-    const idToken = req.headers('Authorize').split(" ")[1];
+    const idToken = req.headers.authorization.split("Bearer ")[1];
+
     const decodedToken = await admin.auth().verifyIdToken(idToken);
     req.user = decodedToken;
+    console.log(decodedToken)
     next();
   } catch (err) {
     console.error(err);
@@ -13,7 +15,7 @@ const authenticate = async (req, res, next) => {
   }
 };
 
-module.exports = authenticate;
+// module.exports = authenticate;
 
 
 

@@ -3,7 +3,6 @@
   const serviceAccount = require("../config/serviceAccount.json");
   const User = require("../models/user");
   var admin = require("firebase-admin");
-  const mongoose = require("mongoose");
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
   });
@@ -30,7 +29,7 @@
     });
     if (userLogin) {
       const payload = {
-        id: userLogin.id,
+        id: userLogin.id, 
         fullname: userLogin.fullname,
         email: userLogin.email,
         phoneNumber: userLogin.phoneNumber,
@@ -51,6 +50,26 @@
     } else {
       if (checkEmailDomain(googlePayload.email, ["fpt.edu.vn"])) {
         register(req, res);
+      if (userLogin) {
+        const payload = {
+          _id: userLogin.id,
+          fullname: userLogin.fullname,
+          email: userLogin.email,
+          phoneNumber: userLogin.phoneNumber,
+          img: userLogin.img,
+          status: userLogin.status,
+          roleName: userLogin.roleName,
+        };
+        console.log(payload);
+        const accessToken = createAccessToken(payload);
+        res.status(200).json({
+          status: "Success",
+          messages: "Login successfully!",
+          data: {
+            user: payload,
+            accessToken,
+          },
+        });
       } else {
           debugger
           const newUser = {
@@ -70,7 +89,8 @@
         
       }
     }
-  } catch (err) {
+  }
+} catch (err) {
     res.status(500).json({
       status: "Fail",
       messages: err.message,
