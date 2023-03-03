@@ -26,24 +26,20 @@ app.use(bodyParser.json())
 // Set up routes
 app.use('/', userRoutes);
 app.use('/', authRoutes);
-app.use('/',postingRoutes)
+app.use('/', postingRoutes)
 
-app.use(function(req, res, next){
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Authorization");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-  next();
-})
-// app.use(cors());
+app.use(cors());
+app.options('*', cors());
+app.use(cors({
+  credentials: true,
+}));
 
-// // đối với tên miền hoặc cổng cụ thể
-// app.use(cors({
-//   origin: 'http://localhost:8000/home'
-// }));
-// app.use('/api/auth', authRoutes);
-// app.use('/api/users', authenticate, authorize(['admin']), userRoutes);
 
-// Set up error handling middleware
-// app.use(errorHandler);
 
+// app.use(function(req, res, next){
+//   res.header("Access-Control-Allow-Origin", "*");
+//   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Authorization");
+//   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+//   next();
+// })
 module.exports = app;
