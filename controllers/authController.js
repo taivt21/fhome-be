@@ -1,28 +1,28 @@
-const { validationResult } = require("express-validator");
-const jwt = require("jsonwebtoken");
-const serviceAccount = require("../config/serviceAccount.json");
-const User = require("../models/user");
-var admin = require("firebase-admin");
-const mongoose = require("mongoose");
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
+  const { validationResult } = require("express-validator");
+  const jwt = require("jsonwebtoken");
+  const serviceAccount = require("../config/serviceAccount.json");
+  const User = require("../models/user");
+  var admin = require("firebase-admin");
+  const mongoose = require("mongoose");
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  });
 
-const checkEmailDomain = (email, listDomain) => {
-  const domain = email.substring(email.lastIndexOf("@") + 1);
-  return listDomain.includes(domain);
-};
+  const checkEmailDomain = (email, listDomain) => {
+    const domain = email.substring(email.lastIndexOf("@") + 1);
+    return listDomain.includes(domain);
+  };
 
-const createAccessToken = (payload) => {
-  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
-};
+  const createAccessToken = (payload) => {
+    return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
+  };
 
-const login = async (req, res) => {
-  try {
-    const googlePayload = jwt.decode(
-      req.body.accessToken,
-      serviceAccount.private_key
-    );
+  const login = async (req, res) => {
+    try {
+      const googlePayload = jwt.decode(
+        req.body.accessToken,
+        serviceAccount.private_key
+      );
 
     const userLogin = await User.findOne({
       email: googlePayload.email,
@@ -58,7 +58,6 @@ const login = async (req, res) => {
             email: googlePayload.email,
             img: googlePayload.picture,
             phoneNumber: googlePayload.phoneNumber || "",
-            roleName:"landlord",
             status: false,
           };
           console.log(googlePayload);
@@ -79,22 +78,22 @@ const login = async (req, res) => {
   }
 };
 
-const register = async (req, res) => {
-  try {
-    const googlePayload = jwt.decode(
-      req.body.accessToken,
-      process.env.FIREBASE_SECRET
-    );
+  const register = async (req, res) => {
+    try {
+      const googlePayload = jwt.decode(
+        req.body.accessToken,
+        process.env.FIREBASE_SECRET
+      );
 
-    const decodeUser = {
-      fullname: googlePayload.fullname,
-      email: googlePayload.email,
-      img: googlePayload.img,
-      phoneNumber: googlePayload.phoneNumber,
-      status: true,
-    };
+      const decodeUser = {
+        fullname: googlePayload.name || " ",
+        email: googlePayload.email,
+        img: googlePayload.picture,
+        phoneNumber: googlePayload.phoneNumber ||" ",
+        status: true,
+      };
 
-    const existingUser = await User.findOne({ email: decodeUser.email });
+      const existingUser = await User.findOne({ email: decodeUser.email });
 
     if (existingUser) {
       res.status(400).json({
@@ -109,7 +108,7 @@ const register = async (req, res) => {
           phoneNumber: user.phoneNumber,
           img: user.img,
           status: user.status,
-          roleName: "landlord",
+          roleName: "fptmember",
         };
         const accessToken = createAccessToken(payload);
         res.status(200).json({
@@ -130,7 +129,7 @@ const register = async (req, res) => {
   }
 };
 
-module.exports = {
-  login,
-  register,
-};
+  module.exports = {
+    login,
+    register,
+  };
