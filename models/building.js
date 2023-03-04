@@ -6,7 +6,7 @@ const buildingSchema = new mongoose.Schema(
         address: { type: String },
         status : {type: Boolean, default: true}
     },
-    { timestamps: true }
+    { timestamps: true },
 );
 
 const Buildings = mongoose.model("Buildings", buildingSchema);

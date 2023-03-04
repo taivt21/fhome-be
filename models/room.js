@@ -2,8 +2,8 @@ const mongoose = require("mongoose");
 
 const roomSchema = new mongoose.Schema(
     {
-        size: { type: Number, required: true, min: 0 },
-        price: { type: Number, required: true, min: 0 },
+        size: { type: Number, min: 0 },
+        price: { type: Number, min: 0 },
         description: { type: String },
         img: { type: String },
         status: { type: Boolean, default: true },

@@ -40,7 +40,7 @@ const getAllRooms = async (req, res) => {
     const rooms = await Rooms.find({});
     const updatedRooms = rooms.map((room) => {
       const updatedRoom = room.toObject();
-      updatedRoom.img = `https://storage.googleapis.com/${bucket.name}/${filename}`;
+      updatedRoom.img = res.rooms.img;
       return updatedRoom;
     });
     res.status(200).json({
