@@ -26,7 +26,7 @@ const createRoom = async (req, res) => {
       });
     }
 
-    const newRoom = new Room({
+    const newRoom = new Rooms({
       ...req.body,
       img: req.body.img // Lấy đường dẫn từ trường img của req.body
     });
@@ -55,7 +55,7 @@ const getAllRooms = async (req, res) => {
     const rooms = await Rooms.find({});
     const updatedRooms = rooms.map((room) => {
       const updatedRoom = room.toObject();
-      updatedRoom.img = `https://storage.googleapis.com/${bucket.name}/${filename}`;
+      updatedRoom.img = res.rooms.img;
       return updatedRoom;
     });
     res.status(200).json({

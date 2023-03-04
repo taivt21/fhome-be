@@ -6,6 +6,7 @@ const bodyParser = require('body-parser')
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const postingRoutes = require('./routes/postingRoutes')
+const roomRoutes = require('./routes/roomRoutes')
 // Import middlewares
 // const authenticate = require('./middlewares/authenticate');
 const authorize = require('./middlewares/authorize');
@@ -35,9 +36,15 @@ app.use(function(req, res, next){
   res.status(200).send();
   next();
 })
+app.use('/', userRoutes);
+app.use('/', authRoutes);
+app.use('/',postingRoutes)
+
 // app.use(cors());
 
 
+// Set up error handling middleware
+// app.use(errorHandler);
 
 // app.use(function(req, res, next){
 //   res.header("Access-Control-Allow-Origin", "*");
