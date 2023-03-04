@@ -1,23 +1,20 @@
 
-const admin = require("../config/serviceAccount.json");
+// require("dotenv").config();
+// const jwt = require('jsonwebtoken');
 
-exports.authenticate = async (req, res, next) => {
-  try {
-    const idToken = req.headers.authorization.split("Bearer ")[1];
+// const authenticate = (req, res, next) => {
+//   const token = req.headers.authorization.split(' ')[1];
+//   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+//     if (err) {
+//       return res.status(401).json({
+//         message: 'Unauthorized'
+//       });
 
-    const decodedToken = await admin.auth().verifyIdToken(idToken);
-    req.user = decodedToken;
-    console.log(decodedToken)
-    next();
-  } catch (err) {
-    console.error(err);
-    return res.status(401).send({ message: "Unauthorized" });
-  }
-};
+//     } else {
+//       req.user = decoded;
+//       next();
+//     }
+//   });
+// };
 
 // module.exports = authenticate;
-
-
-
-
-

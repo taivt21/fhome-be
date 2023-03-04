@@ -5,5 +5,5 @@ const auth = require('../middlewares/authenticate')
 
 // Đăng nhập
 
-router.post("/login",auth.authenticate, authController.login);
+router.post("/login", authController.login);
 module.exports = router;

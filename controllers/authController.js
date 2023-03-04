@@ -50,6 +50,7 @@
     } else {
       if (checkEmailDomain(googlePayload.email, ["fpt.edu.vn"])) {
         register(req, res);
+        return;
       if (userLogin) {
         const payload = {
           _id: userLogin.id,

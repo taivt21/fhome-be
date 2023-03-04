@@ -7,7 +7,7 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const postingRoutes = require('./routes/postingRoutes')
 // Import middlewares
-const authenticate = require('./middlewares/authenticate');
+// const authenticate = require('./middlewares/authenticate');
 const authorize = require('./middlewares/authorize');
 // const errorHandler = require('./middlewares/errorHandler');
 
