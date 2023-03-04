@@ -9,7 +9,6 @@ const roomSchema = new mongoose.Schema(
         status: { type: Boolean, default: true },
         buildings: { type: mongoose.Schema.Types.ObjectId, ref: "Building" },
         users: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-        status: {type: Boolean, default: true}
     },
     { timestamps: true }
 );

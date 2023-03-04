@@ -11,7 +11,7 @@ const createRoom = async (req, res) => {
       });
     }
 
-    const newRoom = new Room({
+    const newRoom = new Rooms({
       ...req.body,
       img: req.body.img // Lấy đường dẫn từ trường img của req.body
     });
