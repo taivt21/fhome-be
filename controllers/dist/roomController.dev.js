@@ -69,7 +69,7 @@ var createRoom = function createRoom(req, res) {
           }));
 
         case 4:
-          newRoom = new Room(_objectSpread({}, req.body, {
+          newRoom = new Rooms(_objectSpread({}, req.body, {
             img: req.body.img // Lấy đường dẫn từ trường img của req.body
 
           })); // Lưu tham chiếu đến đối tượng User tương ứng vào trường users của đối tượng newRoom
@@ -106,46 +106,43 @@ var createRoom = function createRoom(req, res) {
 };
 
 var getAllRooms = function getAllRooms(req, res) {
-  var rooms, updatedRooms;
+  var rooms;
   return regeneratorRuntime.async(function getAllRooms$(_context3) {
     while (1) {
       switch (_context3.prev = _context3.next) {
         case 0:
           _context3.prev = 0;
           _context3.next = 3;
-          return regeneratorRuntime.awrap(Rooms.find({}));
+          return regeneratorRuntime.awrap(Rooms.find({
+            status: true
+          }));
 
         case 3:
           rooms = _context3.sent;
-          updatedRooms = rooms.map(function (room) {
-            var updatedRoom = room.toObject();
-            updatedRoom.img = "https://storage.googleapis.com/".concat(bucket.name, "/").concat(filename);
-            return updatedRoom;
-          });
           res.status(200).json({
             status: "Success",
             messages: "Get rooms successfully!",
             data: {
-              rooms: updatedRooms
+              rooms: rooms
             }
           });
-          _context3.next = 11;
+          _context3.next = 10;
           break;
 
-        case 8:
-          _context3.prev = 8;
+        case 7:
+          _context3.prev = 7;
           _context3.t0 = _context3["catch"](0);
           res.status(500).json({
             status: "Fail",
             messages: _context3.t0.message
           });
 
-        case 11:
+        case 10:
         case "end":
           return _context3.stop();
       }
     }
-  }, null, null, [[0, 8]]);
+  }, null, null, [[0, 7]]);
 };
 
 var getRoomsByUserId = function getRoomsByUserId(req, res) {
@@ -156,7 +153,7 @@ var getRoomsByUserId = function getRoomsByUserId(req, res) {
         case 0:
           _context4.prev = 0;
           _context4.next = 3;
-          return regeneratorRuntime.awrap(Room.find({
+          return regeneratorRuntime.awrap(Rooms.find({
             users: req.user._id
           }));
 

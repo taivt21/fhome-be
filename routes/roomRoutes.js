@@ -9,6 +9,6 @@ const uploadImage = require("../middlewares/uploadImage");
 router.post('/rooms', uploadImage, roomController.createRoom);
 
 // Lấy thông tin post
-router.get('/users', userController.getAllUsers);
+router.get('/getRooms', roomController.getAllRooms);
 
 module.exports = router;

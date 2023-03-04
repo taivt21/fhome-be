@@ -7,6 +7,7 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const postingRoutes = require('./routes/postingRoutes')
 const roomRoutes = require('./routes/roomRoutes')
+const buildingRoutes = require('./routes/buildingRoutes.js')
 // Import middlewares
 // const authenticate = require('./middlewares/authenticate');
 const authorize = require('./middlewares/authorize');
@@ -16,7 +17,6 @@ const authorize = require('./middlewares/authorize');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger.json');
 const setSwaggerUI = require('./utils/swagger');
-
 // Call setSwaggerUI to set up Swagger UI
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
@@ -27,8 +27,9 @@ app.use(bodyParser.json())
 // Set up routes
 app.use('/', userRoutes);
 app.use('/', authRoutes);
-app.use('/',postingRoutes)
-
+app.use('/',postingRoutes);
+app.use('/',roomRoutes);
+app.use('/',buildingRoutes);
 app.use(function(req, res, next){
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Authorization");

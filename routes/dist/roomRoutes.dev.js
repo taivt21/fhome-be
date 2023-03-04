@@ -2,19 +2,15 @@
 
 var express = require("express");
 
-var router = express.Router();
-
-var uploadImage = require("../middlewares/uploadImage");
+var router = express.Router(); // const uploadImage = require("../middlewares/uploadImage");
 
 var roomController = require("../controllers/roomController");
 
-router.post('/rooms', uploadImage, roomController.createRoom);
-router.get('/getBuildings', roomController.getBuildings); // Lấy thông tin post
+var authenticate = require("../middlewares/authenticate");
 
-router.get('/users', userController.getAllUsers); // Lấy thông tin post
+var uploadImage = require("../middlewares/uploadImage");
 
-router.get('/users/:id', authorize(['admin', 'landlord']), userController.getUserById); // Cập nhật thông tin người dùng
+router.post('/rooms', uploadImage, roomController.createRoom); // Lấy thông tin post
 
-router.put('/users/:id', authorize(['admin', 'landlord']), userController.updateUser); // Xóa người dùng
-
-router["delete"]('/users/:id', authorize(['admin']), userController.deleteUser);
+router.get('/getRooms', roomController.getAllRooms);
+module.exports = router;
