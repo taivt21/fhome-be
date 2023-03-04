@@ -1,5 +1,5 @@
 const { validationResult } = require("express-validator");
-const Posting = require("../models/posting");
+const Postings = require("../models/posting");
 
 const createPosting = async (req, res) => {
   // Validate request body
@@ -10,12 +10,12 @@ const createPosting = async (req, res) => {
 
   try {
     // Create a new post
-    const post = new Posting({
+    const post = new Postings({
       title: req.body.title,
       description: req.body.description,
       buildings: req.body.buildings,
       rooms: req.body.rooms,
-      userPosting: req.params.id,
+      userPosting: req.user.id,
       img: req.body.img,
     });
 
@@ -37,7 +37,7 @@ const createPosting = async (req, res) => {
 
 const getAllPostings = async (req, res) => {
   try {
-    const postings = await Posting.find({});
+    const postings = await Postings.find({});
     res.status(200).json({
       status: "Success",
       messages: "Get posts successfully!",
@@ -51,9 +51,27 @@ const getAllPostings = async (req, res) => {
   }
 };
 
+const getPostingByUserId = async (req, res) => {
+  try {
+    const postings = await Postings.find({ userPosting: req.user.id }).populate("buildings rooms");
+
+    res.status(200).json({
+      status: "Success",
+      messages: "Get postings successfully!",
+      data: { postings },
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "Fail",
+      messages: err.message,
+    });
+  }
+};
+
+
 const getPostingById = async (req, res) => {
   try {
-    const posting = await Posting.findById(req.params.postingId);
+    const posting = await Postings.findById(req.params.postingId);
     res.status(200).json({
       status: "Success",
       messages: "Get post successfully!",
@@ -69,7 +87,7 @@ const getPostingById = async (req, res) => {
 
 const updatePosting = async (req, res) => {
   try {
-    const posting = await Posting.findById(req.params.postingId);
+    const posting = await Postings.findById(req.params.postingId);
     if (!posting) {
       return res.status(404).json({ message: "Post not found" });
     }
@@ -107,7 +125,7 @@ const updatePosting = async (req, res) => {
 
 const deletePosting = async (req, res) => {
   try {
-    const posting = await Posting.findById(req.params.postingId);
+    const posting = await Postings.findById(req.params.postingId);
     if (!posting) {
       return res.status(404).json({ message: "Post not found" });
     }
@@ -125,4 +143,5 @@ module.exports = {
   getPostingById,
   updatePosting,
   deletePosting,
+  getPostingByUserId,
 };

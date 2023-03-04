@@ -4,20 +4,15 @@ const admin = require("firebase-admin");
 if (!admin.apps.length) {
   const serviceAccount = require("../config/serviceAccount.json");
 
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
-}
+const admin = require("../config/serviceAccount.json");
 
-const authenticate = async (req, res, next) => {
+exports.authenticate = async (req, res, next) => {
   try {
-    // Get the ID token from the request's authorization header
     const idToken = req.headers.authorization.split("Bearer ")[1];
-    // Verify the ID token
+
     const decodedToken = await admin.auth().verifyIdToken(idToken);
-    // Add the user's ID to req.user
     req.user = decodedToken;
-    console.log(decodedToken);
+    console.log(decodedToken)
     next();
   } catch (err) {
     console.error(err);
@@ -25,4 +20,9 @@ const authenticate = async (req, res, next) => {
   }
 };
 
-module.exports = authenticate;
+// module.exports = authenticate;
+
+
+
+
+
