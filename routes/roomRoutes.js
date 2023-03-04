@@ -5,7 +5,7 @@ const roomController = require("../controllers/roomController");
 
 
 router.post('/rooms', uploadImage, roomController.createRoom);
-
+router.get('/getBuildings',roomController.getBuildings)
 // Lấy thông tin post
 router.get('/users', userController.getAllUsers);
 
