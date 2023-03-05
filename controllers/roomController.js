@@ -37,7 +37,7 @@ const createRoom = async (req, res) => {
 
 const getAllRooms = async (req, res) => {
   try {
-    const rooms = await Rooms.find({});
+    const rooms = await Rooms.find({status: true});
     const updatedRooms = rooms.map((room) => {
       const updatedRoom = room.toObject();
       updatedRoom.img = res.rooms.img;
@@ -58,7 +58,7 @@ const getAllRooms = async (req, res) => {
 
 const getRoomsByUserId = async (req, res) => {
   try {
-    const rooms = await Room.find({ users: req.user._id });
+    const rooms = await Rooms.find({ users: req.user._id });
     res.status(200).json({
       status: "Success",
       messages: "Get rooms successfully!",
