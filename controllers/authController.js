@@ -1,4 +1,3 @@
-const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const serviceAccount = require("../config/serviceAccount.json");
 const User = require("../models/user");
@@ -7,10 +6,7 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
-const checkEmailDomain = (email, listDomain) => {
-  const domain = email.substring(email.lastIndexOf("@") + 1);
-  return listDomain.includes(domain);
-};
+
 
 const createAccessToken = (payload) => {
   return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
@@ -27,6 +23,7 @@ const login = async (req, res) => {
       email: googlePayload.email,
       status: true,
     });
+
     if (userLogin) {
       const payload = {
         id: userLogin.id,
@@ -38,7 +35,9 @@ const login = async (req, res) => {
         roleName: userLogin.roleName,
       };
       console.log(payload);
+
       const accessToken = createAccessToken(payload);
+
       res.status(200).json({
         status: "Success",
         messages: "Login successfully!",
@@ -66,12 +65,12 @@ const login = async (req, res) => {
             status: "Success",
             messages: "Login successfully!",
             data: {
-              users: payload,
+              user: payload,
               accessToken,
             },
           });
         } else {
-          // debugger
+          debugger
           const newUser = {
             fullname: googlePayload.name || "",
             email: googlePayload.email,
@@ -102,7 +101,7 @@ const register = async (req, res) => {
   try {
     const googlePayload = jwt.decode(
       req.body.accessToken,
-      serviceAccount.private_key
+      process.env.FIREBASE_SECRET
     );
 
     const decodeUser = {
@@ -116,7 +115,7 @@ const register = async (req, res) => {
     const existingUser = await User.findOne({ email: decodeUser.email });
 
     if (existingUser) {
-      return res.status(400).json({
+      res.status(400).json({
         status: "Fail",
         messages: "Email already exists",
       });
@@ -142,7 +141,7 @@ const register = async (req, res) => {
       });
     }
   } catch (error) {
-    res.status(500).json({
+    res.status(501).json({
       status: "Fail",
       messages: error.message,
     });
@@ -151,5 +150,4 @@ const register = async (req, res) => {
 
 module.exports = {
   login,
-  register,
 };

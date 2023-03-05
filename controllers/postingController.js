@@ -37,7 +37,7 @@ const createPosting = async (req, res) => {
 
 const getAllPostings = async (req, res) => {
   try {
-    const postings = await Postings.find({});
+    const postings = await Postings.find({status: true});
     res.status(200).json({
       status: "Success",
       messages: "Get posts successfully!",
@@ -130,7 +130,7 @@ const deletePosting = async (req, res) => {
       return res.status(404).json({ message: "Post not found" });
     }
 
-    posting.status = "inactive";
+    posting.status = false;
     const updatedPosting = await posting.save();
     res.status(200).json(updatedPosting);
   } catch (error) {
