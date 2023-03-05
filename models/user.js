@@ -10,8 +10,7 @@ const userSchema = new mongoose.Schema(
     status: { type: Boolean, default: true },
     roleName: {
       type: String,
-      enum: ["admin", "landlord", "fptmember"],
-      default: "fptmember",
+      enum: ["admin", "landlord", "fptmember"]
     },
   },
   { timestamps: true }
