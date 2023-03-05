@@ -6,7 +6,9 @@ const authenticate = require("../middlewares/authenticate");
 const uploadImage = require("../middlewares/uploadImage");
 
 
-router.post('/createRooms',authenticate, uploadImage, roomController.createRoom);
+router.post('/rooms', uploadImage, roomController.createRoom);
 
+// Lấy thông tin post
+router.get('/getRooms', roomController.getAllRooms);
 
 module.exports = router;

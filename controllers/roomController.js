@@ -1,6 +1,21 @@
 const Rooms = require("../models/room");
 const { validationResult } = require("express-validator");
-
+const Building =require('../models/building')
+const getBuildings = async (req, res) => {
+  try {
+    const buildings = await Building.find();
+    res.status(200).json({
+      status: 'Success',
+      message: 'Get buildings successfully!',
+      data:  "buildings" ,
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: 'Fail',
+      message: err.message,
+    });
+  }
+};
 const createRoom = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -37,16 +52,11 @@ const createRoom = async (req, res) => {
 
 const getAllRooms = async (req, res) => {
   try {
-    const rooms = await Rooms.find({status: true});
-    const updatedRooms = rooms.map((room) => {
-      const updatedRoom = room.toObject();
-      updatedRoom.img = res.rooms.img;
-      return updatedRoom;
-    });
+    const rooms = await Rooms.find({status:true});
     res.status(200).json({
       status: "Success",
       messages: "Get rooms successfully!",
-      data: { rooms: updatedRooms },
+      data: { rooms },
     });
   } catch (err) {
     res.status(500).json({
@@ -122,4 +132,5 @@ module.exports = {
   getRoomsByUserId,
   updateRoomById,
   deleteRoomById,
+  getBuildings
 };

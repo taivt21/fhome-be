@@ -1,4 +1,3 @@
-const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const serviceAccount = require("../config/serviceAccount.json");
 const User = require("../models/user");
@@ -7,10 +6,7 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
-// const checkEmailDomain = (email, listDomain) => {
-//   const domain = email.substring(email.lastIndexOf("@") + 1);
-//   return listDomain.includes(domain);
-// };
+
 
 const createAccessToken = (payload) => {
   return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
