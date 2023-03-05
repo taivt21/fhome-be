@@ -1,6 +1,7 @@
 const express = require('express');
 const userController = require('../controllers/userController');
 const authorize = require('../middlewares/authorize');
+const authenticate = require('../middlewares/authenticate');
 const router = express.Router();
 
 // Thêm người dùng mới
@@ -18,7 +19,7 @@ router.put('/users/:id', authorize(['admin', 'landlord']), userController.update
 // Xóa người dùng
 router.delete('/users/:id', authorize(['admin']), userController.deleteUser);
 
-router.get("/getUser",userController.getData)
+router.get("/getUser", userController.getData)
 //http://localhost:3000/getUser
 router.put("/setUserStatus/:userId", userController.setUserStatus);
 //example http://localhost:3000/setUserStatus/63fc61ef617136555e017603

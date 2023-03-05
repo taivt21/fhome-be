@@ -13,6 +13,6 @@ const postSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-const Posting = mongoose.model("Posting", postSchema);
+const Postings = mongoose.model("Postings", postSchema);
 
-module.exports = Posting;
+module.exports = Postings;
