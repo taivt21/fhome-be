@@ -68,12 +68,12 @@ var login = function login(req, res) {
               accessToken: accessToken
             }
           });
-          _context.next = 27;
+          _context.next = 26;
           break;
 
         case 12:
           if (!checkEmailDomain(googlePayload.email, ["fpt.edu.vn"])) {
-            _context.next = 27;
+            _context.next = 26;
             break;
           }
 
@@ -99,15 +99,15 @@ var login = function login(req, res) {
             status: "Success",
             messages: "Login successfully!",
             data: {
-              user: _payload,
+              users: _payload,
               accessToken: _accessToken
             }
           });
-          _context.next = 27;
+          _context.next = 26;
           break;
 
         case 21:
-          debugger;
+          // debugger
           newUser = {
             fullname: googlePayload.name || "",
             email: googlePayload.email,
@@ -116,33 +116,33 @@ var login = function login(req, res) {
             status: false
           };
           console.log(googlePayload);
-          _context.next = 26;
+          _context.next = 25;
           return regeneratorRuntime.awrap(User.insertMany(newUser));
 
-        case 26:
+        case 25:
           res.status(400).json({
             status: "Fail",
             messages: "Your email domain is not supported. Please contact your administrator to support your account!"
           });
 
-        case 27:
-          _context.next = 32;
+        case 26:
+          _context.next = 31;
           break;
 
-        case 29:
-          _context.prev = 29;
+        case 28:
+          _context.prev = 28;
           _context.t0 = _context["catch"](0);
           res.status(500).json({
             status: "Fail",
             messages: _context.t0.message
           });
 
-        case 32:
+        case 31:
         case "end":
           return _context.stop();
       }
     }
-  }, null, null, [[0, 29]]);
+  }, null, null, [[0, 28]]);
 };
 
 var register = function register(req, res) {
@@ -152,7 +152,7 @@ var register = function register(req, res) {
       switch (_context2.prev = _context2.next) {
         case 0:
           _context2.prev = 0;
-          googlePayload = jwt.decode(req.body.accessToken, process.env.FIREBASE_SECRET);
+          googlePayload = jwt.decode(req.body.accessToken, serviceAccount.private_key);
           decodeUser = {
             fullname: googlePayload.name || " ",
             email: googlePayload.email,
@@ -173,12 +173,10 @@ var register = function register(req, res) {
             break;
           }
 
-          res.status(400).json({
+          return _context2.abrupt("return", res.status(400).json({
             status: "Fail",
             messages: "Email already exists"
-          });
-          _context2.next = 12;
-          break;
+          }));
 
         case 10:
           _context2.next = 12;
@@ -209,7 +207,7 @@ var register = function register(req, res) {
         case 14:
           _context2.prev = 14;
           _context2.t0 = _context2["catch"](0);
-          res.status(501).json({
+          res.status(500).json({
             status: "Fail",
             messages: _context2.t0.message
           });

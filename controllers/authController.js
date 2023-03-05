@@ -66,12 +66,12 @@ const login = async (req, res) => {
             status: "Success",
             messages: "Login successfully!",
             data: {
-              user: payload,
+              users: payload,
               accessToken,
             },
           });
         } else {
-          debugger
+          // debugger
           const newUser = {
             fullname: googlePayload.name || "",
             email: googlePayload.email,
@@ -102,7 +102,7 @@ const register = async (req, res) => {
   try {
     const googlePayload = jwt.decode(
       req.body.accessToken,
-      process.env.FIREBASE_SECRET
+      serviceAccount.private_key
     );
 
     const decodeUser = {
@@ -116,7 +116,7 @@ const register = async (req, res) => {
     const existingUser = await User.findOne({ email: decodeUser.email });
 
     if (existingUser) {
-      res.status(400).json({
+      return res.status(400).json({
         status: "Fail",
         messages: "Email already exists",
       });
@@ -142,7 +142,7 @@ const register = async (req, res) => {
       });
     }
   } catch (error) {
-    res.status(501).json({
+    res.status(500).json({
       status: "Fail",
       messages: error.message,
     });
