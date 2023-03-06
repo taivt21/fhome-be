@@ -37,6 +37,12 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
+// Set up routes
+app.use('/', userRoutes);
+app.use('/', authRoutes);
+app.use('/',postingRoutes);
+app.use('/',roomRoutes);
+app.use('/',buildingRoutes);
 
 app.use(function(req, res, next){
   res.header("Access-Control-Allow-Origin", "*");
@@ -46,12 +52,7 @@ app.use(function(req, res, next){
 })
 // app.use(cors());
 
-// Set up routes
-app.use('/', userRoutes);
-app.use('/', authRoutes);
-app.use('/',postingRoutes);
-app.use('/',roomRoutes);
-app.use('/',buildingRoutes);
+
 // Set up error handling middleware
 // app.use(errorHandler);
 
