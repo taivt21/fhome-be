@@ -40,7 +40,7 @@ npm start
 
 ## Demo
 
-Check out the live demo of FHOME at https://fhome-be.vercel.app/login
+Check out the live demo of FHOME at https://fhome-be.vercel.app
 
 ## License
 
