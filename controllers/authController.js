@@ -19,11 +19,27 @@ const createAccessToken = (payload) => {
 
 const login = async (req, res) => {
   try {
+    if (!req.body.accessToken) {
+      res.status(400).json({
+        status: "Fail",
+        messages: "Access token is required!",
+      });
+      return;
+    }
+
     const googlePayload = jwt.decode(
       req.body.accessToken,
       serviceAccount.private_key
     );
 
+    if (!googlePayload || !googlePayload.email) {
+      res.status(400).json({
+        status: "Fail",
+        messages: "Invalid access token!",
+      });
+      return;
+    }
+    
     const userLogin = await User.findOne({
       email: googlePayload.email,
       status: true,
@@ -57,7 +73,9 @@ const login = async (req, res) => {
       );
 
       if (domain === "fpt.edu.vn") {
-        const roleName = adminEmails.includes(googlePayload.email) ? "admin" : "fptmember";
+        const roleName = adminEmails.includes(googlePayload.email)
+          ? "admin"
+          : "fptmember";
 
         const newUser = {
           fullname: googlePayload.name || "",
