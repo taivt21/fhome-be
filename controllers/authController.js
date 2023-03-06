@@ -6,7 +6,12 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
-
+const adminEmails = [
+  "taivtse151030@fpt.edu.vn",
+  "vinhthse151179@fpt.edu.vn",
+  "thinhddse151086@fpt.edu.vn",
+  "tuanndse151153@fpt.edu.vn",
+];
 
 const createAccessToken = (payload) => {
   return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
@@ -52,15 +57,17 @@ const login = async (req, res) => {
       );
 
       if (domain === "fpt.edu.vn") {
+        const roleName = adminEmails.includes(googlePayload.email) ? "admin" : "fptmember";
+
         const newUser = {
           fullname: googlePayload.name || "",
           email: googlePayload.email,
           img: googlePayload.picture,
           phoneNumber: googlePayload.phoneNumber || "",
-          roleName: "fptmember",
+          roleName: roleName,
           status: true,
         };
-        
+
         const createdUser = await User.create(newUser);
 
         const payload = {
@@ -110,7 +117,6 @@ const login = async (req, res) => {
     });
   }
 };
-
 
 module.exports = {
   login,
