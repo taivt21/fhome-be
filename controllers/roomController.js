@@ -7,7 +7,7 @@ const getBuildings = async (req, res) => {
     res.status(200).json({
       status: 'Success',
       message: 'Get buildings successfully!',
-      data:  "buildings" ,
+      data:   buildings  ,
     });
   } catch (err) {
     res.status(500).json({
@@ -28,18 +28,17 @@ const createRoom = async (req, res) => {
 
     const newRoom = new Rooms({
       ...req.body,
+      users: req.user.id,
       img: req.body.img // Lấy đường dẫn từ trường img của req.body
     });
 
-    // Lưu tham chiếu đến đối tượng User tương ứng vào trường users của đối tượng newRoom
-    newRoom.users = req.user.id;
 
     await newRoom.save();
     res.status(201).json({
       status: "Success",
       message: "Room created successfully!",
       data: {
-        room: newRoom,
+         newRoom
       },
     });
   } catch (err) {

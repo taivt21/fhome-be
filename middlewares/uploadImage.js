@@ -32,10 +32,11 @@ const upload = multer({
 const uploadImage = (req, res, next) => {
   upload(req, res, async (err) => {
     if (err) {
+      console.log(err);
       // Nếu xảy ra lỗi trong quá trình upload, trả về lỗi 400
       return res.status(400).json({
         status: "Fail",
-        message: "loi upload",
+        message: err.message,
       });
     }
 
@@ -49,7 +50,7 @@ const uploadImage = (req, res, next) => {
 
     try {
       // Tạo đường dẫn trong Firebase Storage
-      const filePath = `rooms/${uuidv4()}${path.extname(
+      const filePath = `room/${uuidv4()}${path.extname(
         req.file.originalname
       )}`;
       const fileUpload = bucket.file(filePath);
@@ -74,8 +75,11 @@ const uploadImage = (req, res, next) => {
       blobStream.on("finish", async () => {
         // req.body.img = `gs://${serviceAccount.project_id}/${filePath}`;
         const file = bucket.file(filePath);
+        // Tạo một URL đã ký với thời gian hết hạn là 30 ngày
+        const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days from now
         const publicUrl = await file.getSignedUrl({
           action: "read",
+          expires: expires
         });
         req.body.img = publicUrl[0];
         next();
