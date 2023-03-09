@@ -1,5 +1,5 @@
 const User = require('../models/user');
-
+const mongoose = require('mongoose');
 // Lấy thông tin tất cả người dùng
 exports.getAllUsers = async (req, res) => {
   try {
@@ -13,7 +13,8 @@ exports.getAllUsers = async (req, res) => {
 // Lấy thông tin người dùng theo ID
 exports.getUserById = async (req, res) => {
   try {
-    const user = await User.findById(req.params.userId, '-__v');
+    const user = await User.findById(req.params.id, '-__v');
+    //bên url đặt biến là id thì bên này gọi id chứ không phải userID
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -45,7 +46,7 @@ exports.createUser = async (req, res) => {
 // Cập nhật thông tin người dùng
 exports.updateUser = async (req, res) => {
   try {
-    const user = await User.findById(req.params.userId);
+    const user = await User.findById(req.params.id);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -84,7 +85,8 @@ exports.updateUser = async (req, res) => {
 // Xoá người dùng
 exports.deleteUser = async (req, res) => {
   try {
-    const user = await User.findById(req.params.userId);
+    const user = await User.findById(req.params.id);
+    console.log(user)
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -118,8 +120,8 @@ exports.getData = async (req, res) => {
 exports.setUserStatus = async (req, res) => {
   try {
     const userId = req.params.userId;
-    const updatedUser = await User.findOneAndUpdate(
-      { _id: userId },
+    const updatedUser = await User.findByIdAndUpdate(
+      mongoose.Types.ObjectId(userId),
       { status: true, roleName: "landlord" },
       { new: true } // trả về user sau khi đã update
     );
@@ -146,8 +148,9 @@ exports.setUserStatus = async (req, res) => {
 //delete User theo id
 exports.deleteUser = async (req, res) => {
   try {
-    const userId = req.params.userId;
+    const userId = req.params.id;
     const deletedUser = await User.findByIdAndDelete(userId);
+    console.log(deletedUser)
 
     if (!deletedUser) {
       return res.status(404).json({

@@ -33,6 +33,16 @@ module.exports.getPostingById = function getPostingById (req, res, next, posting
     });
 };
 
+module.exports.getPostingByUserIdGET = function getPostingByUserIdGET (req, res, next) {
+  Posting.getPostingByUserIdGET()
+    .then(function (response) {
+      utils.writeJson(res, response);
+    })
+    .catch(function (response) {
+      utils.writeJson(res, response);
+    });
+};
+
 module.exports.updatePostingWithAuth = function updatePostingWithAuth (req, res, next, body, postingId) {
   Posting.updatePostingWithAuth(body, postingId)
     .then(function (response) {

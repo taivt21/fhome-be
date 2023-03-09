@@ -94,11 +94,25 @@ exports.createUser = function(body) {
  * This can only be done by the logged in.
  *
  * userID String The name that needs to be deleted
- * no response value expected for this operation
+ * returns User
  **/
 exports.deleteUser = function(userID) {
   return new Promise(function(resolve, reject) {
-    resolve();
+    var examples = {};
+    examples['application/json'] = {
+  "_ID" : "adminID",
+  "FullName" : "adminName",
+  "password" : "password",
+  "phoneNum" : "phoneNum",
+  "email" : "email",
+  "status" : true,
+  "roleName" : "fptmember"
+};
+    if (Object.keys(examples).length > 0) {
+      resolve(examples[Object.keys(examples)[0]]);
+    } else {
+      resolve();
+    }
   });
 }
 
@@ -282,11 +296,29 @@ exports.getUserById = function(userID) {
  *
  * body User Update an user status in the data (optional)
  * userID String name that need to be update
- * no response value expected for this operation
+ * returns inline_response_200_2
  **/
 exports.updateUserStatus = function(body,userID) {
   return new Promise(function(resolve, reject) {
-    resolve();
+    var examples = {};
+    examples['application/json'] = {
+  "data" : {
+    "_ID" : "adminID",
+    "FullName" : "adminName",
+    "password" : "password",
+    "phoneNum" : "phoneNum",
+    "email" : "email",
+    "status" : true,
+    "roleName" : "fptmember"
+  },
+  "messages" : "User status updated successfully!",
+  "status" : "Success"
+};
+    if (Object.keys(examples).length > 0) {
+      resolve(examples[Object.keys(examples)[0]]);
+    } else {
+      resolve();
+    }
   });
 }
 
@@ -297,11 +329,29 @@ exports.updateUserStatus = function(body,userID) {
  *
  * body User Update an user status in the data (optional)
  * userID String name that need to be update
- * no response value expected for this operation
+ * returns inline_response_200_2
  **/
 exports.updateUserStatus = function(body,userID) {
   return new Promise(function(resolve, reject) {
-    resolve();
+    var examples = {};
+    examples['application/json'] = {
+  "data" : {
+    "_ID" : "adminID",
+    "FullName" : "adminName",
+    "password" : "password",
+    "phoneNum" : "phoneNum",
+    "email" : "email",
+    "status" : true,
+    "roleName" : "fptmember"
+  },
+  "messages" : "User status updated successfully!",
+  "status" : "Success"
+};
+    if (Object.keys(examples).length > 0) {
+      resolve(examples[Object.keys(examples)[0]]);
+    } else {
+      resolve();
+    }
   });
 }
 

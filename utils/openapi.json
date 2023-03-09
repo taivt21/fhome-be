@@ -1,0 +1,727 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "F_homes",
+    "description": "This is api for my team project",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://fhome-be.vercel.app/"
+    }
+  ],
+  "security": [
+    {
+      "BasicAuth": []
+    }
+  ],
+  "paths": {
+    "/login": {
+      "post": {
+        "tags": [
+          "Authorization"
+        ],
+        "summary": "Logs user into the system",
+        "description": "",
+        "operationId": "loginUser",
+        "requestBody": {
+          "description": "Add your accessToken",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/accessToken"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/accessToken"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/accessToken"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          },
+          "400": {
+            "description": "Invalid username/password supplied"
+          }
+        },
+        "x-swagger-router-controller": "User"
+      }
+    },
+    "/logout": {
+      "get": {
+        "tags": [
+          "Authorization"
+        ],
+        "summary": "Logs out current logged in user session",
+        "description": "",
+        "operationId": "logoutUser",
+        "parameters": [],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        },
+        "x-swagger-router-controller": "User"
+      }
+    },
+    "/getUser": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Finds All User",
+        "description": "Multiple status values can be provided with comma separated strings",
+        "operationId": "findUser",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "string"
+                      },
+                      "messages": {
+                        "type": "string"
+                      },
+                      "data": {
+                        "$ref": "#/components/schemas/User"
+                      }
+                    }
+                  },
+                  "x-content-type": "application/json"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid status value"
+          }
+        },
+        "x-swagger-router-controller": "User"
+      }
+    },
+    "/setUserStatu/{userID}": {
+      "put": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Update user",
+        "description": "This can only be done by the logged in user.",
+        "operationId": "updateUser",
+        "parameters": [
+          {
+            "name": "userID",
+            "in": "path",
+            "description": "name that need to be update",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Update an existent user in the data",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        },
+        "x-swagger-router-controller": "userRoutes"
+      },
+      "delete": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Delete user",
+        "description": "This can only be done by the logged in user.",
+        "operationId": "deleteUser",
+        "parameters": [
+          {
+            "name": "userID",
+            "in": "path",
+            "description": "The name that needs to be deleted",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid username supplied"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "x-swagger-router-controller": "User"
+      }
+    },
+    "/users": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Finds All User",
+        "description": "Multiple status values can be provided with comma separated strings",
+        "operationId": "findUserWithAuth",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  },
+                  "x-content-type": "application/json"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid status value"
+          }
+        },
+        "x-swagger-router-controller": "User"
+      },
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Create user",
+        "description": "This can only be done by the logged in user.",
+        "operationId": "createUser",
+        "requestBody": {
+          "description": "Create a user",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        },
+        "x-swagger-router-controller": "userRoutes"
+      }
+    },
+    "/users/{userID}": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Get user by user id",
+        "description": "",
+        "operationId": "getUserById",
+        "parameters": [
+          {
+            "name": "userID",
+            "in": "path",
+            "description": "The name that needs to be fetched. Use user1 for testing. ",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid username supplied"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "x-swagger-router-controller": "User"
+      },
+      "put": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Update user",
+        "description": "This can only be done by the logged in user.",
+        "operationId": "updateUserWithAuth",
+        "parameters": [
+          {
+            "name": "userID",
+            "in": "path",
+            "description": "name that need to be update",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Update an existent user in the data",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        },
+        "x-swagger-router-controller": "userRoutes"
+      },
+      "delete": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Delete user",
+        "description": "This can only be done by the logged in user.",
+        "operationId": "deleteUserwithinAuth",
+        "parameters": [
+          {
+            "name": "userID",
+            "in": "path",
+            "description": "The name that needs to be deleted",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid username supplied"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "x-swagger-router-controller": "User"
+      }
+    },
+    "/postingNew": {
+      "post": {
+        "tags": [
+          "Posting"
+        ],
+        "summary": "create new posting",
+        "description": "",
+        "operationId": "UserPosting",
+        "requestBody": {
+          "description": "create a new post",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Posting"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/Posting"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/Posting"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successful"
+          },
+          "400": {
+            "description": "Invalid supplied"
+          }
+        },
+        "x-swagger-router-controller": "User"
+      }
+    },
+    "/getAllPosting": {
+      "get": {
+        "tags": [
+          "Posting"
+        ],
+        "summary": "getAllPostings",
+        "description": "",
+        "operationId": "getAllPostings",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Posting"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/Posting"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid username supplied"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "x-swagger-router-controller": "User"
+      }
+    },
+    "/getPostingById/{PostingID}": {
+      "get": {
+        "tags": [
+          "Posting"
+        ],
+        "summary": "getPostingById",
+        "description": "",
+        "operationId": "getPostingById",
+        "parameters": [
+          {
+            "name": "PostingID",
+            "in": "path",
+            "description": "The name that needs to be fetched. Use user1 for testing. ",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Posting"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/Posting"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid username supplied"
+          },
+          "404": {
+            "description": "Posting not found"
+          }
+        },
+        "x-swagger-router-controller": "Posting"
+      },
+      "put": {
+        "tags": [
+          "Posting"
+        ],
+        "summary": "Update Posting by ID",
+        "parameters": [
+          {
+            "name": "PostingID",
+            "in": "path",
+            "required": true,
+            "description": "ID of the Posting to update",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Posting data to update",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "boolean",
+                    "default": true
+                  },
+                  "buildings": {
+                    "type": "string",
+                    "description": "ID of the associated building"
+                  },
+                  "rooms": {
+                    "type": "string",
+                    "description": "ID of the associated room"
+                  },
+                  "userPosting": {
+                    "type": "string",
+                    "description": "ID of the posting user"
+                  },
+                  "img": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Posting updated successfully"
+          },
+          "400": {
+            "description": "Invalid input data"
+          },
+          "404": {
+            "description": "Posting not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Posting"
+        ],
+        "summary": "Update Posting status by ID",
+        "parameters": [
+          {
+            "name": "PostingID",
+            "in": "path",
+            "required": true,
+            "description": "ID of the Posting to update",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Posting update successfully"
+          },
+          "404": {
+            "description": "Posting not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BasicAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT,"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email of the user",
+            "example": "john.doe@example.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "Password of the user",
+            "example": "password123"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "description": "Phone number of the user",
+            "example": "0987654321"
+          },
+          "fullname": {
+            "type": "string",
+            "description": "Full name of the user",
+            "example": "John Doe"
+          },
+          "img": {
+            "type": "string",
+            "description": "URL to user's image",
+            "example": "https://example.com/images/user.jpg"
+          },
+          "status": {
+            "type": "boolean",
+            "description": "Status of the user",
+            "example": true
+          },
+          "roleName": {
+            "type": "string",
+            "enum": [
+              "admin",
+              "landlord",
+              "fptmember"
+            ],
+            "description": "Role name of the user",
+            "example": "fptmember"
+          }
+        }
+      },
+      "accessToken": {
+        "description": "your accessToken",
+        "example": {
+          "accessToken": "your Token"
+        }
+      },
+      "Posting": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "title"
+          },
+          "Description": {
+            "type": "string",
+            "description": "PostingDescription"
+          },
+          "buildings": {
+            "type": "string",
+            "description": "buildings"
+          },
+          "roomTypes": {
+            "$ref": "#/components/schemas/Room"
+          },
+          "userPosting": {
+            "$ref": "#/components/schemas/User"
+          },
+          "img": {
+            "type": "string",
+            "description": "img"
+          }
+        }
+      },
+      "Room": {
+        "type": "object",
+        "properties": {
+          "Size": {
+            "type": "string",
+            "description": "PostingDescription"
+          },
+          "Price": {
+            "type": "string",
+            "description": "PostingDescription"
+          },
+          "Description": {
+            "type": "string",
+            "description": "PostingDescription"
+          },
+          "Status": {
+            "type": "string",
+            "description": "PostingDescription"
+          },
+          "Building": {
+            "type": "string",
+            "description": "PostingDescription"
+          },
+          "User": {
+            "$ref": "#/components/schemas/User"
+          }
+        }
+      }
+    }
+  }
+}

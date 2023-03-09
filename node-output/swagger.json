@@ -2,15 +2,11 @@
   "openapi" : "3.0.0",
   "info" : {
     "title" : "F_homes",
-    "version" : "1.0.0",
-    "description": "This platform provides an UI for API using",
-    "contact": {
-      "name": "Vu Tai",
-      "url":"https://github.com/taivt21"
-    }
+    "description" : "This is api for my team project",
+    "version" : "1.0.0"
   },
   "servers" : [ {
-    "url" : "https://fhome-be.vercel.app/"
+    "url" : "https://f-homes-be.vercel.app/"
   } ],
   "security" : [ {
     "BasicAuth" : [ ]

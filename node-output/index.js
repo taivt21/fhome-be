@@ -1,20 +1,20 @@
 'use strict';
 
-var path = require('path');
-
-var oas3Tools = require('oas3-tools');
+const path = require('path');
+const oas3Tools = require('oas3-tools');
+const router = require('express').Router();
 
 // swaggerRouter configuration
-var options = {
+const options = {
     routing: {
         controllers: path.join(__dirname, './controllers')
     },
 };
 
-var expressAppConfig = oas3Tools.expressAppConfig(path.join(__dirname, 'api/openapi.yaml'), options);
-var app = expressAppConfig.getApp();
+const expressAppConfig = oas3Tools.expressAppConfig(path.join(__dirname, 'api/openapi.yaml'), options);
+const app = expressAppConfig.getApp();
 
+// Initialize the Swagger middleware
 router.use('/', app);
 
 module.exports = router;
-
