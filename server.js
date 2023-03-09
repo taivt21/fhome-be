@@ -12,7 +12,7 @@ const redis = require('async-redis');
 //     }
 // });
 const client = redis.createClient({
-  url: "redis://default:Nz1Und0z7ndq78ehKR3A3AuyS9E42uzN@redis-13965.c299.asia-northeast1-1.gce.cloud.redislabs.com:13965",
+  url: process.env.REDIS_URL,
 });
 // kết nối tới Redis server
 client.on("connect", () => {

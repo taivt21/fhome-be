@@ -1,10 +1,11 @@
 const { validationResult } = require("express-validator");
 const Postings = require("../models/posting");
 const redis = require('async-redis');
+require("dotenv").config();
 
 // tạo Redis client instance
 const client = redis.createClient({
-  url: "redis://default:Nz1Und0z7ndq78ehKR3A3AuyS9E42uzN@redis-13965.c299.asia-northeast1-1.gce.cloud.redislabs.com:13965",
+  url: process.env.REDIS_URL,
 });
 
 const createPosting = async (req, res) => {
@@ -116,7 +117,7 @@ const getPostingByUserId = async (req, res) => {
 
 const getPostingById = async (req, res) => {
   try {
-    const posting = await Postings.findById(req.params.postingId);
+    const posting = await Postings.findById(req.params.id);
     res.status(200).json({
       status: "Success",
       messages: "Get post successfully!",
@@ -132,7 +133,7 @@ const getPostingById = async (req, res) => {
 
 const updatePosting = async (req, res) => {
   try {
-    const posting = await Postings.findById(req.params.postingId);
+    const posting = await Postings.findById(req.params.id);
     if (!posting) {
       return res.status(404).json({ message: "Post not found" });
     }
@@ -181,11 +182,11 @@ const updatePosting = async (req, res) => {
 
 
 // kiểm tra nếu có dữ liệu thì tiến hành xoá bản ghi tương ứng
-// với postingId bằng cách sử dụng Array.filter
+// với id bằng cách sử dụng Array.filter
 
 const deletePosting = async (req, res) => {
   try {
-    const posting = await Postings.findById(req.params.postingId);
+    const posting = await Postings.findById(req.params.id);
     if (!posting) {
       return res.status(404).json({ message: "Post not found" });
     }
@@ -197,7 +198,7 @@ const deletePosting = async (req, res) => {
     const postings = await client.get("postings");   
       if (postings !== null) {
         const parsedPostings = JSON.parse(postings);
-        const updatedPostings = parsedPostings.filter(post => post.id !== req.params.postingId);
+        const updatedPostings = parsedPostings.filter(post => post.id !== req.params.id);
         client.set("postings", JSON.stringify(updatedPostings), (err) => {
           if (err) throw err;
         });

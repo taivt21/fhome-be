@@ -10,7 +10,7 @@ const roomRoutes = require('./routes/roomRoutes')
 const buildingRoutes = require('./routes/buildingRoutes.js')
 
 
-
+app.use(cors());
 
 // Set up Swagger UI
 const swaggerUi = require('swagger-ui-express');
@@ -24,7 +24,7 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
-app.use(cors());
+
 // Set up routes
 app.use('/', userRoutes);
 app.use('/', authRoutes);
