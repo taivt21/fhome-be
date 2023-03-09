@@ -167,11 +167,9 @@ const updatePosting = async (req, res) => {
     // Update Redis cache
     const postings = await client.get("postings");
     if (postings !== null) {
-      const parsedPostings = JSON.parse(postings);
-      const updatedPostings = parsedPostings.map((p) =>
-        p.id === updatedPosting.id ? updatedPosting : p
-      );
-      await client.set("postings", JSON.stringify(updatedPostings));
+      await client.del("postings", (err) => {
+        if (err) throw err;
+      });
     }
 
     res.status(200).json(updatedPosting);
@@ -197,14 +195,11 @@ const deletePosting = async (req, res) => {
     // Delete the posting from Redis cache
     const postings = await client.get("postings");   
       if (postings !== null) {
-        const parsedPostings = JSON.parse(postings);
-        const updatedPostings = parsedPostings.filter(post => post.id !== req.params.id);
-        client.set("postings", JSON.stringify(updatedPostings), (err) => {
+        await client.del("postings", (err) => {
           if (err) throw err;
         });
       };
-
-    res.status(200).json(updatedPosting);
+      res.status(200).json(updatedPosting);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
