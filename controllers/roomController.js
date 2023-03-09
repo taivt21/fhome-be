@@ -68,7 +68,7 @@ const getAllRooms = async (req, res) => {
 
 const getRoomsByUserId = async (req, res) => {
   try {
-    const rooms = await Rooms.find({ users: req.user._id });
+    const rooms = await Rooms.find({ users: req.user.id });
     res.status(200).json({
       status: "Success",
       messages: "Get rooms successfully!",

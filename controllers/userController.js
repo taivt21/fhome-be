@@ -119,7 +119,7 @@ exports.setUserStatus = async (req, res) => {
   try {
     const userId = req.params.userId;
     const updatedUser = await User.findOneAndUpdate(
-      { _id: userId },
+      { id: userId },
       { status: true, roleName: "landlord" },
       { new: true } // trả về user sau khi đã update
     );

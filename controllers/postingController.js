@@ -168,7 +168,7 @@ const updatePosting = async (req, res) => {
     if (postings !== null) {
       const parsedPostings = JSON.parse(postings);
       const updatedPostings = parsedPostings.map((p) =>
-        p._id === updatedPosting._id ? updatedPosting : p
+        p.id === updatedPosting.id ? updatedPosting : p
       );
       await client.set("postings", JSON.stringify(updatedPostings));
     }
@@ -197,7 +197,7 @@ const deletePosting = async (req, res) => {
     const postings = await client.get("postings");   
       if (postings !== null) {
         const parsedPostings = JSON.parse(postings);
-        const updatedPostings = parsedPostings.filter(post => post._id !== req.params.postingId);
+        const updatedPostings = parsedPostings.filter(post => post.id !== req.params.postingId);
         client.set("postings", JSON.stringify(updatedPostings), (err) => {
           if (err) throw err;
         });
