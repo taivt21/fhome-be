@@ -29,21 +29,13 @@ const createPosting = async (req, res) => {
     // Save the post to the database
     await post.save();
 
-    // Save the new post to Redis cache
-    client.get("postings", async (err, postings) => {
-      if (err) throw err;
-
-      let updatedPostings = [];
-
+    //delete cache redis
+    const postings = await client.get("postings");   
       if (postings !== null) {
-        // If data exists in cache, add the new post to the cache
-        updatedPostings = JSON.parse(postings);
-      }
-
-      updatedPostings.push(post);
-      client.set("postings", JSON.stringify(updatedPostings));
-    });
-
+        await client.del("postings", (err) => {
+          if (err) throw err;
+        });
+      };
     res.status(201).json({
       status: "Success",
       messages: "Post created successfully!",
