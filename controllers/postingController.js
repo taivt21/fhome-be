@@ -1,5 +1,11 @@
 const { validationResult } = require("express-validator");
 const Postings = require("../models/posting");
+const redis = require('async-redis');
+
+// tạo Redis client instance
+const client = redis.createClient({
+  url: "redis://default:Nz1Und0z7ndq78ehKR3A3AuyS9E42uzN@redis-13965.c299.asia-northeast1-1.gce.cloud.redislabs.com:13965",
+});
 
 const createPosting = async (req, res) => {
   // Validate request body
@@ -53,36 +59,38 @@ const createPosting = async (req, res) => {
 const getAllPostings = async (req, res) => {
   try {
     // Check if the data exists in the cache
-    client.get("postings", async (err, postings) => {
-      if (err) throw err;
+    const postings = await client.get("postings");
 
-      if (postings !== null) {
-        // If data exists in cache, return it
-        const parsedPostings = JSON.parse(postings);
-        res.status(200).json({
-          status: "Success",
-          messages: "Get posts successfully from cache!",
-          data: { postings: parsedPostings },
-        });
-      } else {
-        // If data does not exist in cache, fetch from the database
-        const postings = await Postings.find({ status: true });
-        // Save the fetched data to Redis cache
-        client.set("postings", JSON.stringify(postings));
-        res.status(200).json({
-          status: "Success",
-          messages: "Get posts successfully from database!",
-          data: { postings },
-        });
-      }
-    });
+    if (postings !== null) {
+      // If data exists in cache, return it
+      const parsedPostings = JSON.parse(postings);
+      res.status(200).json({
+        status: "Success",
+        messages: "Get posts successfully from cache!",
+        data: { postings: parsedPostings },
+      });
+    } else {
+      // If data does not exist in cache, fetch from the database
+      const postings = await Postings.find({ status: true });
+      // Save the fetched data to Redis cache
+      client.set("postings", JSON.stringify(postings));
+      res.status(200).json({
+        status: "Success",
+        messages: "Get posts successfully from database!",
+        data: { postings },
+      });
+    }
   } catch (err) {
+    console.log(err);
     res.status(500).json({
       status: "Fail",
       messages: err.message,
     });
   }
 };
+
+
+
 
 
 const getPostingByUserId = async (req, res) => {
@@ -156,18 +164,14 @@ const updatePosting = async (req, res) => {
     const updatedPosting = await posting.save();
 
     // Update Redis cache
-    client.get("postings", (err, postings) => {
-      if (err) throw err;
-
-      if (postings !== null) {
-        //map() để tạo ra một mảng mới, trong đó posting được cập nhật sẽ được thay thế bởi posting cũ trong mảng hiện tại
-        const parsedPostings = JSON.parse(postings);
-        const updatedPostings = parsedPostings.map((p) =>
-          p._id === updatedPosting._id ? updatedPosting : p
-        );
-        client.set("postings", JSON.stringify(updatedPostings));
-      }
-    });
+    const postings = await client.get("postings");
+    if (postings !== null) {
+      const parsedPostings = JSON.parse(postings);
+      const updatedPostings = parsedPostings.map((p) =>
+        p._id === updatedPosting._id ? updatedPosting : p
+      );
+      await client.set("postings", JSON.stringify(updatedPostings));
+    }
 
     res.status(200).json(updatedPosting);
   } catch (error) {
@@ -176,20 +180,8 @@ const updatePosting = async (req, res) => {
 };
 
 
-// client.get để lấy dữ liệu cache hiện tại trong Redis và 
 // kiểm tra nếu có dữ liệu thì tiến hành xoá bản ghi tương ứng
 // với postingId bằng cách sử dụng Array.filter
-const deletePostingFromCache = (postingId) => {
-  client.get("postings", (err, postings) => {
-    if (err) throw err;
-
-    if (postings !== null) {
-      const parsedPostings = JSON.parse(postings);
-      const updatedPostings = parsedPostings.filter(post => post._id !== postingId);
-      client.set("postings", JSON.stringify(updatedPostings));
-    }
-  });
-};
 
 const deletePosting = async (req, res) => {
   try {
@@ -202,7 +194,14 @@ const deletePosting = async (req, res) => {
     const updatedPosting = await posting.save();
 
     // Delete the posting from Redis cache
-    deletePostingFromCache(req.params.postingId);
+    const postings = await client.get("postings");   
+      if (postings !== null) {
+        const parsedPostings = JSON.parse(postings);
+        const updatedPostings = parsedPostings.filter(post => post._id !== req.params.postingId);
+        client.set("postings", JSON.stringify(updatedPostings), (err) => {
+          if (err) throw err;
+        });
+      };
 
     res.status(200).json(updatedPosting);
   } catch (error) {
