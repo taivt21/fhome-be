@@ -10,5 +10,5 @@ router.post('/rooms', uploadImage, roomController.createRoom);
 
 // Lấy thông tin post
 router.get('/getRooms', roomController.getAllRooms);
-
+router.get('/getRooms', roomController.getAllRooms);
 module.exports = router;
