@@ -16,6 +16,7 @@ const getBuildings = async (req, res) => {
     });
   }
 };
+
 const createRoom = async (req, res) => {
   try {
     const errors = validationResult(req);
