@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const serviceAccount = require("../config/serviceAccount.json");
 const User = require("../models/user");
-var admin = require("firebase-admin");
+const admin = require("firebase-admin");
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });

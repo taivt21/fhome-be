@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const roomSchema = new mongoose.Schema(
     {
+        roomName: {type: String},
         size: { type: Number, min: 0 },
         price: { type: Number, min: 0 },
         description: { type: String },

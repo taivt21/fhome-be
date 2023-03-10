@@ -1,9 +1,10 @@
+const { default: mongoose } = require('mongoose');
 const User = require('../models/user');
 
 // Lấy thông tin tất cả người dùng
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.find({}, '-__v');
+    const users = await User.find({status: false});
     res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -13,7 +14,7 @@ exports.getAllUsers = async (req, res) => {
 // Lấy thông tin người dùng theo ID
 exports.getUserById = async (req, res) => {
   try {
-    const user = await User.findById(req.params.userId, '-__v');
+    const user = await User.findById(req.params.id);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -45,7 +46,7 @@ exports.createUser = async (req, res) => {
 // Cập nhật thông tin người dùng
 exports.updateUser = async (req, res) => {
   try {
-    const user = await User.findById(req.params.userId);
+    const user = await User.findById(req.params.id);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -84,12 +85,12 @@ exports.updateUser = async (req, res) => {
 // Xoá người dùng
 exports.deleteUser = async (req, res) => {
   try {
-    const user = await User.findById(req.params.userId);
+    const user = await User.findById(req.params.id);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    user.status = 'inactive';
+    user.status = false;
     const updatedUser = await user.save();
     res.status(200).json(updatedUser);
   } catch (error) {
@@ -117,9 +118,10 @@ exports.getData = async (req, res) => {
 //set status user thành true
 exports.setUserStatus = async (req, res) => {
   try {
-    const userId = req.params.userId;
-    const updatedUser = await User.findOneAndUpdate(
-      { id: userId },
+    const userId = req.params.id;
+    const updatedUser = await User.findByIdAndUpdate(
+      // { id: userId },
+      mongoose.Types.ObjectId(userId),
       { status: true, roleName: "landlord" },
       { new: true } // trả về user sau khi đã update
     );
@@ -146,7 +148,7 @@ exports.setUserStatus = async (req, res) => {
 //delete User theo id
 exports.deleteUser = async (req, res) => {
   try {
-    const userId = req.params.userId;
+    const userId = req.params.id;
     const deletedUser = await User.findByIdAndDelete(userId);
 
     if (!deletedUser) {
