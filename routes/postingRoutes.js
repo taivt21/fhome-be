@@ -11,4 +11,5 @@ router.get('/getPostingById/:id',postingController.getPostingById)
 router.put('/updatePosting/:id',postingController.updatePosting)
 router.delete('/deletePosting/:id',postingController.deletePosting)
 
+router.get('/getAllPostingByUserId',authenticate, postingController.getPostingByUserId)
 module.exports = router;
