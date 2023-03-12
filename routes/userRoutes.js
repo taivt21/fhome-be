@@ -9,6 +9,7 @@ router.post('/users', authorize(['admin']), userController.createUser);
 
 // Lấy thông tin tất cả người dùng
 router.get('/users', authorize(["admin", "landlord"]), userController.getAllUsers);
+router.get('/getAllUsers', userController.getAllUsers);
 
 // Lấy thông tin một người dùng
 router.get('/users/:id', authorize(['admin', 'landlord']), userController.getUserById);

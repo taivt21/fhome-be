@@ -9,20 +9,7 @@ const postingRoutes = require('./routes/postingRoutes')
 const roomRoutes = require('./routes/roomRoutes')
 const buildingRoutes = require('./routes/buildingRoutes.js')
 
-// const session = require('express-session');
-// const RedisStore = require('connect-redis')(session);
-// const redis = require('redis');
-// const client = redis.createClient();
 
-// app.use(
-//   session({
-//     store: new RedisStore({ client }),
-//     secret: 'your-secret-key',
-//     resave: false,
-//     saveUninitialized: true,
-//     cookie: { secure: true, maxAge: 600000 } // thời gian sống của phiên là 10 phút
-//   })
-// );
 
 
 // Set up Swagger UI
@@ -38,8 +25,6 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 app.use(cors());
-
-
 // Set up routes
 app.use('/', userRoutes);
 app.use('/', authRoutes);
