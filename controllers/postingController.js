@@ -1,5 +1,12 @@
 const { validationResult } = require("express-validator");
 const Postings = require("../models/posting");
+const redis = require('async-redis');
+require("dotenv").config();
+
+// tạo Redis client instance
+const client = redis.createClient({
+  url: process.env.REDIS_URL,
+});
 
 const createPosting = async (req, res) => {
   // Validate request body
@@ -22,21 +29,13 @@ const createPosting = async (req, res) => {
     // Save the post to the database
     await post.save();
 
-    // Save the new post to Redis cache
-    client.get("postings", async (err, postings) => {
-      if (err) throw err;
-
-      let updatedPostings = [];
-
+    //delete cache redis
+    const postings = await client.get("postings");   
       if (postings !== null) {
-        // If data exists in cache, add the new post to the cache
-        updatedPostings = JSON.parse(postings);
-      }
-
-      updatedPostings.push(post);
-      client.set("postings", JSON.stringify(updatedPostings));
-    });
-
+        await client.del("postings", (err) => {
+          if (err) throw err;
+        });
+      };
     res.status(201).json({
       status: "Success",
       messages: "Post created successfully!",
@@ -53,36 +52,38 @@ const createPosting = async (req, res) => {
 const getAllPostings = async (req, res) => {
   try {
     // Check if the data exists in the cache
-    client.get("postings", async (err, postings) => {
-      if (err) throw err;
+    const postings = await client.get("postings");
 
-      if (postings !== null) {
-        // If data exists in cache, return it
-        const parsedPostings = JSON.parse(postings);
-        res.status(200).json({
-          status: "Success",
-          messages: "Get posts successfully from cache!",
-          data: { postings: parsedPostings },
-        });
-      } else {
-        // If data does not exist in cache, fetch from the database
-        const postings = await Postings.find({ status: true });
-        // Save the fetched data to Redis cache
-        client.set("postings", JSON.stringify(postings));
-        res.status(200).json({
-          status: "Success",
-          messages: "Get posts successfully from database!",
-          data: { postings },
-        });
-      }
-    });
+    if (postings !== null) {
+      // If data exists in cache, return it
+      const parsedPostings = JSON.parse(postings);
+      res.status(200).json({
+        status: "Success",
+        messages: "Get posts successfully from cache!",
+        data: { postings: parsedPostings },
+      });
+    } else {
+      // If data does not exist in cache, fetch from the database
+      const postings = await Postings.find({ status: true });
+      // Save the fetched data to Redis cache
+      client.set("postings", JSON.stringify(postings));
+      res.status(200).json({
+        status: "Success",
+        messages: "Get posts successfully from database!",
+        data: { postings },
+      });
+    }
   } catch (err) {
+    console.log(err);
     res.status(500).json({
       status: "Fail",
       messages: err.message,
     });
   }
 };
+
+
+
 
 
 const getPostingByUserId = async (req, res) => {
@@ -108,7 +109,7 @@ const getPostingByUserId = async (req, res) => {
 
 const getPostingById = async (req, res) => {
   try {
-    const posting = await Postings.findById(req.params.postingId);
+    const posting = await Postings.findById(req.params.id);
     res.status(200).json({
       status: "Success",
       messages: "Get post successfully!",
@@ -124,7 +125,7 @@ const getPostingById = async (req, res) => {
 
 const updatePosting = async (req, res) => {
   try {
-    const posting = await Postings.findById(req.params.postingId);
+    const posting = await Postings.findById(req.params.id);
     if (!posting) {
       return res.status(404).json({ message: "Post not found" });
     }
@@ -156,18 +157,12 @@ const updatePosting = async (req, res) => {
     const updatedPosting = await posting.save();
 
     // Update Redis cache
-    client.get("postings", (err, postings) => {
-      if (err) throw err;
-
-      if (postings !== null) {
-        //map() để tạo ra một mảng mới, trong đó posting được cập nhật sẽ được thay thế bởi posting cũ trong mảng hiện tại
-        const parsedPostings = JSON.parse(postings);
-        const updatedPostings = parsedPostings.map((p) =>
-          p._id === updatedPosting._id ? updatedPosting : p
-        );
-        client.set("postings", JSON.stringify(updatedPostings));
-      }
-    });
+    const postings = await client.get("postings");
+    if (postings !== null) {
+      await client.del("postings", (err) => {
+        if (err) throw err;
+      });
+    }
 
     res.status(200).json(updatedPosting);
   } catch (error) {
@@ -176,24 +171,12 @@ const updatePosting = async (req, res) => {
 };
 
 
-// client.get để lấy dữ liệu cache hiện tại trong Redis và 
 // kiểm tra nếu có dữ liệu thì tiến hành xoá bản ghi tương ứng
-// với postingId bằng cách sử dụng Array.filter
-const deletePostingFromCache = (postingId) => {
-  client.get("postings", (err, postings) => {
-    if (err) throw err;
-
-    if (postings !== null) {
-      const parsedPostings = JSON.parse(postings);
-      const updatedPostings = parsedPostings.filter(post => post._id !== postingId);
-      client.set("postings", JSON.stringify(updatedPostings));
-    }
-  });
-};
+// với id bằng cách sử dụng Array.filter
 
 const deletePosting = async (req, res) => {
   try {
-    const posting = await Postings.findById(req.params.postingId);
+    const posting = await Postings.findById(req.params.id);
     if (!posting) {
       return res.status(404).json({ message: "Post not found" });
     }
@@ -202,9 +185,13 @@ const deletePosting = async (req, res) => {
     const updatedPosting = await posting.save();
 
     // Delete the posting from Redis cache
-    deletePostingFromCache(req.params.postingId);
-
-    res.status(200).json(updatedPosting);
+    const postings = await client.get("postings");   
+      if (postings !== null) {
+        await client.del("postings", (err) => {
+          if (err) throw err;
+        });
+      };
+      res.status(200).json(updatedPosting);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
