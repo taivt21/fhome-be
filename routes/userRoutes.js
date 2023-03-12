@@ -28,7 +28,6 @@ router.get(
 router.put(
   "/users/:id",
   authorize(["admin", "landlord"]),
-  uploadImage,
   userController.updateUser
 );
 

@@ -50,9 +50,7 @@ const uploadImage = (req, res, next) => {
 
     try {
       // Tạo đường dẫn trong Firebase Storage
-      const filePath = `room/${uuidv4()}${path.extname(
-        req.file.originalname
-      )}`;
+      const filePath = `room/${uuidv4()}${path.extname(req.file.originalname)}`;
       const fileUpload = bucket.file(filePath);
 
       // Khởi tạo stream để upload file lên Firebase Storage
@@ -79,7 +77,7 @@ const uploadImage = (req, res, next) => {
         const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days from now
         const publicUrl = await file.getSignedUrl({
           action: "read",
-          expires: expires
+          expires: expires,
         });
         req.body.img = publicUrl[0];
         next();
