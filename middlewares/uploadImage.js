@@ -40,13 +40,13 @@ const uploadImage = (req, res, next) => {
       });
     }
 
-    if (!req.file) {
-      // Nếu không có file nào được chọn, trả về lỗi 400
-      return res.status(400).json({
-        status: "Fail",
-        message: "Please select an image to upload.",
-      });
-    }
+//     if (!req.file) {
+//       // Nếu không có file nào được chọn, trả về lỗi 400
+//       return res.status(400).json({
+//         status: "Fail",
+//         message: "Please select an image to upload.",
+//       });
+//     }
 
     try {
       // Tạo đường dẫn trong Firebase Storage
