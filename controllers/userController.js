@@ -1,5 +1,5 @@
-const { default: mongoose } = require('mongoose');
-const User = require('../models/user');
+const { default: mongoose } = require("mongoose");
+const User = require("../models/user");
 
 // Lấy thông tin tất cả người dùng
 exports.getAllUsers = async (req, res) => {
@@ -16,7 +16,7 @@ exports.getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
     res.status(200).json(user);
   } catch (error) {
@@ -48,7 +48,7 @@ exports.updateUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
     if (req.body.email) {
@@ -87,7 +87,7 @@ exports.deleteUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
     user.status = false;
@@ -105,7 +105,7 @@ exports.getData = async (req, res) => {
       status: "Success",
       messages: "Get users successfully!",
       data: {
-        users
+        users,
       },
     });
   } catch (err) {
@@ -114,7 +114,7 @@ exports.getData = async (req, res) => {
       messages: err.message,
     });
   }
-}
+};
 //set status user thành true
 exports.setUserStatus = async (req, res) => {
   try {
@@ -135,7 +135,7 @@ exports.setUserStatus = async (req, res) => {
       status: "Success",
       messages: "User status updated successfully!",
       data: {
-        user: updatedUser
+        user: updatedUser,
       },
     });
   } catch (err) {
@@ -172,4 +172,3 @@ exports.deleteUser = async (req, res) => {
     });
   }
 };
-
