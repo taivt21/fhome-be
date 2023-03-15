@@ -91,7 +91,6 @@ const getPostingByUserId = async (req, res) => {
     const postings = await Postings.find({ userPosting: req.user.id }).populate(
       "buildings rooms"
     );
-
     res.status(200).json({
       status: "Success",
       messages: "Get postings successfully!",

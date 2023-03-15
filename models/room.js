@@ -8,8 +8,8 @@ const roomSchema = new mongoose.Schema(
         description: { type: String },
         img: { type: String },
         status: { type: Boolean, default: true },
-        buildings: { type: mongoose.Schema.Types.ObjectId, ref: "Building" },
-        users: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        buildings: { type: mongoose.Schema.Types.ObjectId, ref: "Buildings" },
+        users: { type: mongoose.Schema.Types.ObjectId, ref: "Users" },
     },
     { timestamps: true }
 );
