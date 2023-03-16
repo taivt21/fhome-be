@@ -8,7 +8,7 @@ router.post('/createPosting', authenticate, uploadImage, postingController.creat
 
 router.get('/getAllPostings',postingController.getAllPostings)
 
-router.get('/getPostingByUserId', authenticate, postingController.getAllPostings)
+router.get('/getPostingByUserId', authenticate, postingController.getPostingByUserId)
 
 router.get('/getPostingById/:id',postingController.getPostingById)
 
