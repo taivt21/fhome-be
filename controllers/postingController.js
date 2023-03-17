@@ -253,6 +253,22 @@ const getPostingRejected = async (req, res) => {
     });
   }
 };
+const getAllStatus = async (req, res) => {
+  try {
+    const postings = await Postings.find();
+    res.status(200).json({
+      status: "Success",
+      data: { postings },
+    });
+    // }
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      status: "Fail",
+      messages: err.message,
+    });
+  }
+};
 
 const getPostingByUserId = async (req, res) => {
   try {
@@ -379,5 +395,6 @@ module.exports = {
   getPostingDraft,
   getPostingPending,
   getPostingApproved,
-  getPostingRejected
+  getPostingRejected,
+  getAllStatus
 };

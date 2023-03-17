@@ -21,6 +21,13 @@ router.get(
 
 router.get("/getPostingById/:id", postingController.getPostingById);
 
+router.get("/getDraft", postingController.getPostingDraft);
+router.get("/getPending", postingController.getPostingPending);
+router.get("/getApproved", postingController.getPostingApproved);
+router.get("/getRejected", postingController.getPostingRejected);
+router.get("/getAllStatus", postingController.getAllStatus);
+
+
 router.put("/updatePosting/:id", postingController.updatePosting);
 
 // router.put('/setStatusPosting/:id', postingController.setStatusPosting)
