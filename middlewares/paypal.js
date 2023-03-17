@@ -247,6 +247,24 @@ async function getListInvoices() {
   }
 }
 
+async function getInvoiceDetail(hoadonId) {
+  const url = `https://api-m.sandbox.paypal.com/v2/invoicing/invoices/${hoadonId}`;
+  const token = await getAccessToken();
+  let result = "";
+  try {
+    const response = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    result = response.data;
+    return result;
+  } catch (error) {
+    console.log(error.message);
+    return result;
+  }
+}
+
 module.exports = {
   generatenextInvoiceNumber,
   createDraftInvoice,
@@ -254,4 +272,5 @@ module.exports = {
   changeInvoiceStatusToUNPAID,
   deleteInvoice,
   getListInvoices,
+  getInvoiceDetail,
 };

@@ -1,8 +1,9 @@
 const { validationResult } = require("express-validator");
 const Postings = require("../models/posting");
-const redis = require('async-redis');
+const redis = require("async-redis");
 require("dotenv").config();
-
+const paypal = require("../middlewares/paypal");
+const Users = require("../models/user");
 // tạo Redis client instance
 const client = redis.createClient({
   url: process.env.REDIS_URL,
@@ -16,6 +17,16 @@ const createPosting = async (req, res) => {
   }
 
   try {
+    const user = await Users.findById(req.user.id);
+
+    const hoadon = await paypal.createDraftInvoice(
+      user.fullname,
+      user.email,
+      user.phoneNumber
+    );
+
+    const hoaDonId = hoadon.href.split("/")[6];
+
     // Create a new post
     const post = new Postings({
       title: req.body.title,
@@ -24,18 +35,20 @@ const createPosting = async (req, res) => {
       rooms: req.body.rooms,
       userPosting: req.user.id,
       img: req.body.img,
+      invoiceId: hoaDonId,
     });
 
     // Save the post to the database
     await post.save();
 
     //delete cache redis
-    const postings = await client.get("postings");   
-      if (postings !== null) {
-        await client.del("postings", (err) => {
-          if (err) throw err;
-        });
-      };
+    const postings = await client.get("postings");
+    if (postings !== null) {
+      await client.del("postings", (err) => {
+        if (err) throw err;
+      });
+    }
+
     res.status(201).json({
       status: "Success",
       messages: "Post created successfully!",
@@ -47,6 +60,42 @@ const createPosting = async (req, res) => {
       messages: err.message,
     });
   }
+};
+
+const confirmPost = async (req, res) => {
+  const posting = await Postings.findById(req.params.id);
+  console.log(
+    "file: postingController.js:67 ~ confirmPost ~ posting:",
+    posting
+  );
+  if (!posting) {
+    res.status(200).json({
+      message: "Not found post",
+    });
+  }
+
+  try {
+    const invoiceId = posting.invoiceId;
+    await paypal.changeInvoiceStatusToUNPAID(invoiceId);
+    // ["draft", "approved", "rejected", "pending", "published"]
+    if (
+      posting.status == "approved" ||
+      posting.status == "pending" ||
+      posting.status == "published"
+    ) {
+      res.status(200).json({
+        message: "Only draft post can do this. Please check again",
+      });
+    }
+
+    posting.status = "pending";
+
+    const updatePost = await posting.save();
+    res.status(200).json({
+      message: "update successfully",
+      data: updatePost,
+    });
+  } catch (error) {}
 };
 
 const getAllPostings = async (req, res) => {
@@ -82,10 +131,6 @@ const getAllPostings = async (req, res) => {
   }
 };
 
-
-
-
-
 const getPostingByUserId = async (req, res) => {
   try {
     const postings = await Postings.find({ userPosting: req.user.id }).populate(
@@ -103,8 +148,6 @@ const getPostingByUserId = async (req, res) => {
     });
   }
 };
-
-
 
 const getPostingById = async (req, res) => {
   try {
@@ -169,7 +212,6 @@ const updatePosting = async (req, res) => {
   }
 };
 
-
 // kiểm tra nếu có dữ liệu thì tiến hành xoá bản ghi tương ứng
 // với id bằng cách sử dụng Array.filter
 
@@ -184,13 +226,13 @@ const deletePosting = async (req, res) => {
     const updatedPosting = await posting.save();
 
     // Delete the posting from Redis cache
-    const postings = await client.get("postings");   
-      if (postings !== null) {
-        await client.del("postings", (err) => {
-          if (err) throw err;
-        });
-      };
-      res.status(200).json(updatedPosting);
+    const postings = await client.get("postings");
+    if (postings !== null) {
+      await client.del("postings", (err) => {
+        if (err) throw err;
+      });
+    }
+    res.status(200).json(updatedPosting);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -203,4 +245,5 @@ module.exports = {
   updatePosting,
   deletePosting,
   getPostingByUserId,
+  confirmPost,
 };
