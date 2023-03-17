@@ -9,22 +9,31 @@ const admin = require("firebase-admin");
 
 // Hàm gửi thông báo push đến một thiết bị cụ thể
 const sendNotification = (deviceToken, title, message) => {
-  const payload = {
-    notification: {
-      title: title,
-      body: message,
-    },
-  };
+  const axios = require('axios');
+const serverKey = process.env.SERVER_KEY; // Server key from Firebase console
+const deviceToken = 'device-token'; // Device token from the client app
 
-  admin
-    .messaging()
-    .sendToDevice(deviceToken, payload)
-    .then((response) => {
-      console.log("Successfully sent message:", response);
-    })
-    .catch((error) => {
-      console.log("Error sending message:", error);
-    });
+const data = {
+  notification: {
+    title: 'New message',
+    body: 'You have a new message'
+  },
+  to: deviceToken
+};
+
+axios.post('https://fcm.googleapis.com/fcm/send', data, {
+  headers: {
+    'Authorization': `key=${serverKey}`,
+    'Content-Type': 'application/json'
+  }
+})
+.then(response => {
+  console.log(response.data);
+})
+.catch(error => {
+  console.log(error);
+});
+
 };
 
 module.exports = {
