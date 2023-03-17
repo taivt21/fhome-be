@@ -23,6 +23,9 @@ router.get(
   authorize(["admin", "landlord"]),
   userController.getUserById
 );
+router.get( "/userProfile/:id",  userController.getUserById);
+
+router.put( "/userProfile/:id", uploadImage, userController.updateUser);
 
 // Cập nhật thông tin người dùng
 router.put(
@@ -42,5 +45,6 @@ router.put("/setUserStatus/:id", userController.setUserStatus);
 
 router.delete("/deleteUser/:id", userController.deleteUser);
 //example http://localhost:3000/deleteUser/63fc6149d0db61d24a614b62
+
 
 module.exports = router;

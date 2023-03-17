@@ -180,6 +180,73 @@ const getAllPostings = async (req, res) => {
   }
 };
 
+const getPostingDraft = async (req, res) => {
+  try {
+    const postings = await Postings.find({ status: "draft" });
+    // Save the fetched data to Redis cache
+    // client.set("postings", JSON.stringify(postings));
+    res.status(200).json({
+      status: "Success",
+      data: { postings },
+    });
+    // }
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      status: "Fail",
+      messages: err.message,
+    });
+  }
+};
+const getPostingPending = async (req, res) => {
+  try {
+    const postings = await Postings.find({ status: "pending" });
+    res.status(200).json({
+      status: "Success",
+      data: { postings },
+    });
+    // }
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      status: "Fail",
+      messages: err.message,
+    });
+  }
+};
+const getPostingApproved = async (req, res) => {
+  try {
+    const postings = await Postings.find({ status: "approved" });
+    res.status(200).json({
+      status: "Success",
+      data: { postings },
+    });
+    // }
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      status: "Fail",
+      messages: err.message,
+    });
+  }
+};
+const getPostingRejected = async (req, res) => {
+  try {
+    const postings = await Postings.find({ status: "rejected" });
+    res.status(200).json({
+      status: "Success",
+      data: { postings },
+    });
+    // }
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      status: "Fail",
+      messages: err.message,
+    });
+  }
+};
+
 const getPostingByUserId = async (req, res) => {
   try {
     const postings = await Postings.find({ userPosting: req.user.id }).populate(
@@ -293,8 +360,6 @@ const deletePosting = async (req, res) => {
   }
 };
 
-const publishedPost = async (hoadonId) => {};
-
 module.exports = {
   createPosting,
   getAllPostings,
@@ -304,4 +369,8 @@ module.exports = {
   getPostingByUserId,
   confirmPost,
   approvedPost,
+  getPostingDraft,
+  getPostingPending,
+  getPostingApproved,
+  getPostingRejected
 };
