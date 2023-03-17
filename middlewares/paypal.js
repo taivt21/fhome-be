@@ -68,13 +68,13 @@ const createDraftInvoice = async (name, email, phone) => {
           name: {
             given_name: name,
           },
-          // phones: [
-          //   {
-          //     country_code: "084",
-          //     national_number: phone,
-          //     phone_type: "MOBILE",
-          //   },
-          // ],
+          phones: [
+            {
+              country_code: "084",
+              national_number: phone,
+              phone_type: "MOBILE",
+            },
+          ],
         },
         primary_recipients: [
           {
