@@ -4,18 +4,30 @@ const authenticate = require("../middlewares/authenticate");
 const uploadImage = require("../middlewares/uploadImage");
 const router = express.Router();
 
-router.post('/createPosting', authenticate, uploadImage, postingController.createPosting)
+router.post(
+  "/createPosting",
+  authenticate,
+  uploadImage,
+  postingController.createPosting
+);
 
-router.get('/getAllPostings',postingController.getAllPostings)
+router.get("/getAllPostings", postingController.getAllPostings);
 
-router.get('/getPostingByUserId', authenticate, postingController.getPostingByUserId)
+router.get(
+  "/getPostingByUserId",
+  authenticate,
+  postingController.getPostingByUserId
+);
 
-router.get('/getPostingById/:id',postingController.getPostingById)
+router.get("/getPostingById/:id", postingController.getPostingById);
 
-router.put('/updatePosting/:id',postingController.updatePosting)
+router.put("/updatePosting/:id", postingController.updatePosting);
 
 // router.put('/setStatusPosting/:id', postingController.setStatusPosting)
 
-router.delete('/deletePosting/:id',postingController.deletePosting)
+router.delete("/deletePosting/:id", postingController.deletePosting);
+
+router.put("/confirm-post/:id", postingController.confirmPost);
+router.put("/approve-post/:id", postingController.approvedPost);
 
 module.exports = router;

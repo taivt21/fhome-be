@@ -30,7 +30,6 @@ router.get("/invoices", async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     const response = await paypal.getListInvoices();
-
     res.status(200).json({
       msg: "success",
       data: response,
