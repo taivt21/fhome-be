@@ -68,13 +68,13 @@ const createDraftInvoice = async (name, email, phone) => {
           name: {
             given_name: name,
           },
-          phones: [
-            {
-              country_code: "084",
-              national_number: phone,
-              phone_type: "MOBILE",
-            },
-          ],
+          // phones: [
+          //   {
+          //     country_code: "084",
+          //     national_number: phone,
+          //     phone_type: "MOBILE",
+          //   },
+          // ],
         },
         primary_recipients: [
           {
@@ -152,7 +152,7 @@ const createDraftInvoice = async (name, email, phone) => {
 
     return response.data;
   } catch (error) {
-    console.log(error.message);
+    // console.log(error);
   }
 };
 

@@ -22,7 +22,7 @@ const createPosting = async (req, res) => {
     const hoadon = await paypal.createDraftInvoice(
       user.fullname,
       user.email,
-      user.phoneNumber
+      user.phoneNumber === null || undefined ? "0123456789" : user.phoneNumber
     );
 
     const hoaDonId = hoadon.href.split("/")[6];
