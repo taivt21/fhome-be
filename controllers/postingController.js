@@ -64,20 +64,17 @@ const createPosting = async (req, res) => {
 
 const confirmPost = async (req, res) => {
   const posting = await Postings.findById(req.params.id);
-  console.log(
-    "file: postingController.js:67 ~ confirmPost ~ posting:",
-    posting
-  );
+
   if (!posting) {
-    res.status(200).json({
+    res.status(404).json({
       message: "Not found post",
     });
   }
 
   try {
-    const invoiceId = posting.invoiceId;
-    await paypal.changeInvoiceStatusToUNPAID(invoiceId);
-    // ["draft", "approved", "rejected", "pending", "published"]
+    // const invoiceId = posting.invoiceId;
+    // const link = await paypal.changeInvoiceStatusToUNPAID(invoiceId);
+
     if (
       posting.status == "approved" ||
       posting.status == "pending" ||
@@ -94,34 +91,86 @@ const confirmPost = async (req, res) => {
     res.status(200).json({
       message: "update successfully",
       data: updatePost,
+      // link: link,
     });
-  } catch (error) {}
+  } catch (error) {
+    res.status(500).json({
+      message: "Something went wrong",
+      error: error.message,
+    });
+  }
+};
+
+const approvedPost = async (req, res) => {
+  try {
+    const posting = await Postings.findById(req.params.id);
+    if (!posting) {
+      res.status(404).json({
+        message: "Not found post",
+      });
+    }
+    const invoiceId = posting.invoiceId;
+    const link = await paypal.changeInvoiceStatusToUNPAID(invoiceId);
+    if (posting.status != "pending") {
+      res.status(200).json({
+        message: "Only pending post can do this. Please check again",
+      });
+    }
+
+    posting.status = "approved";
+
+    const updatePost = await posting.save();
+    res.status(200).json({
+      message: "update successfully",
+      data: updatePost,
+      link: link,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Something went wrong",
+      error: error.message,
+    });
+  }
 };
 
 const getAllPostings = async (req, res) => {
   try {
     // Check if the data exists in the cache
-    const postings = await client.get("postings");
+    // const postings = await client.get("postings");
 
-    if (postings !== null) {
-      // If data exists in cache, return it
-      const parsedPostings = JSON.parse(postings);
-      res.status(200).json({
-        status: "Success",
-        messages: "Get posts successfully from cache!",
-        data: { postings: parsedPostings },
-      });
-    } else {
-      // If data does not exist in cache, fetch from the database
-      const postings = await Postings.find({ status: true });
-      // Save the fetched data to Redis cache
-      client.set("postings", JSON.stringify(postings));
-      res.status(200).json({
-        status: "Success",
-        messages: "Get posts successfully from database!",
-        data: { postings },
-      });
-    }
+    // if (postings !== null) {
+    //   // If data exists in cache, return it
+
+    //   const parsedPostings = JSON.parse(postings);
+    //   res.status(200).json({
+    //     status: "Success",
+    //     messages: "Get posts successfully from cache!",
+    //     data: { postings: parsedPostings },
+    //   });
+    // }
+    // else {
+    // If data does not exist in cache, fetch from the database
+
+    const listpost = await Postings.find({ status: "approved" });
+
+    listpost.forEach(async (post) => {
+      const hoadon = await paypal.getInvoiceDetail(post.invoiceId);
+
+      if (hoadon.status === "PAID") {
+        post.status = "published";
+        post.save();
+      }
+    });
+
+    const postings = await Postings.find({ status: "published" });
+    // Save the fetched data to Redis cache
+    // client.set("postings", JSON.stringify(postings));
+    res.status(200).json({
+      status: "Success",
+      messages: "Get posts successfully from database!",
+      data: { postings },
+    });
+    // }
   } catch (err) {
     console.log(err);
     res.status(500).json({
@@ -218,11 +267,17 @@ const updatePosting = async (req, res) => {
 const deletePosting = async (req, res) => {
   try {
     const posting = await Postings.findById(req.params.id);
+
     if (!posting) {
       return res.status(404).json({ message: "Post not found" });
     }
 
-    posting.status = false;
+    const hoadonId = posting.invoiceId;
+
+    await paypal.deleteInvoice(hoadonId);
+
+    posting.status = "rejected";
+
     const updatedPosting = await posting.save();
 
     // Delete the posting from Redis cache
@@ -238,6 +293,8 @@ const deletePosting = async (req, res) => {
   }
 };
 
+const publishedPost = async (hoadonId) => {};
+
 module.exports = {
   createPosting,
   getAllPostings,
@@ -246,4 +303,5 @@ module.exports = {
   deletePosting,
   getPostingByUserId,
   confirmPost,
+  approvedPost,
 };

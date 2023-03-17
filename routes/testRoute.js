@@ -29,8 +29,7 @@ router.get("/invoices", async (req, res) => {
 
 router.get("/", async (req, res) => {
   try {
-    const response = await paypal.getInvoiceDetail("INV2-PCEJ-JRY9-NZG6-H2KG");
-
+    const response = await paypal.getListInvoices();
     res.status(200).json({
       msg: "success",
       data: response,

@@ -33,6 +33,7 @@ const createDraftInvoice = async (name, email, phone) => {
     const url = "https://api-m.sandbox.paypal.com/v2/invoicing/invoices";
 
     const today = new Date();
+    today.setDate(today.getDate() - 1); // giảm đi 1 ngày
     const year = today.getFullYear();
     const month = (today.getMonth() + 1).toString().padStart(2, "0");
     const date = today.getDate().toString().padStart(2, "0");
@@ -230,7 +231,7 @@ async function deleteInvoice(invoiceId) {
 
 // lay danh sach hoa don dang
 async function getListInvoices() {
-  const url = `https://api-m.sandbox.paypal.com/v2/invoicing/invoices?page=1&page_size=10&total_required=true&fields=amount`;
+  const url = `https://api-m.sandbox.paypal.com/v2/invoicing/invoices?&total_required=true&fields=amount`;
   const token = await getAccessToken();
   let result = "";
   try {

@@ -28,5 +28,6 @@ router.put("/updatePosting/:id", postingController.updatePosting);
 router.delete("/deletePosting/:id", postingController.deletePosting);
 
 router.put("/confirm-post/:id", postingController.confirmPost);
+router.put("/approve-post/:id", postingController.approvedPost);
 
 module.exports = router;
