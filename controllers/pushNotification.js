@@ -1,4 +1,4 @@
-const admin = require('firebase-admin');
+const admin = require("firebase-admin");
 
 // Đường dẫn tới tệp JSON chứa thông tin xác thực Firebase của bạn
 // const serviceAccount = require('../config/serviceAccount.json');
@@ -12,19 +12,21 @@ const sendNotification = (deviceToken, title, message) => {
   const payload = {
     notification: {
       title: title,
-      body: message
-    }
+      body: message,
+    },
   };
 
-  admin.messaging().sendToDevice(deviceToken, payload)
-    .then(response => {
-      console.log('Successfully sent message:', response);
+  admin
+    .messaging()
+    .sendToDevice(deviceToken, payload)
+    .then((response) => {
+      console.log("Successfully sent message:", response);
     })
-    .catch(error => {
-      console.log('Error sending message:', error);
+    .catch((error) => {
+      console.log("Error sending message:", error);
     });
-}
+};
 
 module.exports = {
-  sendNotification
+  sendNotification,
 };

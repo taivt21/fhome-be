@@ -19,6 +19,13 @@ const createPosting = async (req, res) => {
   try {
     const user = await Users.findById(req.user.id);
 
+    if (user.phoneNumber.length <= 0) {
+      res.status(500).json({
+        message: "Please update your phone number",
+      });
+      return;
+    }
+
     const hoadon = await paypal.createDraftInvoice(
       user.fullname,
       user.email,

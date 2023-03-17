@@ -152,7 +152,7 @@ const createDraftInvoice = async (name, email, phone) => {
 
     return response.data;
   } catch (error) {
-    console.log(error.message);
+    // console.log(error);
   }
 };
 
