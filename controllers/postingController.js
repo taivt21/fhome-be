@@ -4,10 +4,11 @@ const redis = require("async-redis");
 require("dotenv").config();
 const paypal = require("../middlewares/paypal");
 const Users = require("../models/user");
+const sendEmail = require("../utils/sendmail");
 // tạo Redis client instance
-const client = redis.createClient({
-  url: process.env.REDIS_URL,
-});
+// const client = redis.createClient({
+//   url: process.env.REDIS_URL,
+// });
 
 const createPosting = async (req, res) => {
   // Validate request body
@@ -49,12 +50,12 @@ const createPosting = async (req, res) => {
     await post.save();
 
     //delete cache redis
-    const postings = await client.get("postings");
-    if (postings !== null) {
-      await client.del("postings", (err) => {
-        if (err) throw err;
-      });
-    }
+    // const postings = await client.get("postings");
+    // if (postings !== null) {
+    //   await client.del("postings", (err) => {
+    //     if (err) throw err;
+    //   });
+    // }
 
     res.status(201).json({
       status: "Success",
@@ -70,7 +71,7 @@ const createPosting = async (req, res) => {
 };
 
 const confirmPost = async (req, res) => {
-  const posting = await Postings.findById(req.params.id);
+  const posting = await Postings.findById(req.params.id).populate("userPosting");
 
   if (!posting) {
     res.status(404).json({
@@ -93,8 +94,9 @@ const confirmPost = async (req, res) => {
     }
 
     posting.status = "pending";
-
     const updatePost = await posting.save();
+    await sendEmail(posting);
+
     res.status(200).json({
       message: "update successfully",
       data: updatePost,
@@ -110,7 +112,9 @@ const confirmPost = async (req, res) => {
 
 const approvedPost = async (req, res) => {
   try {
-    const posting = await Postings.findById(req.params.id);
+    const posting = await Postings.findById(req.params.id).populate(
+      "userPosting"
+    );
     if (!posting) {
       res.status(404).json({
         message: "Not found post",
@@ -118,6 +122,8 @@ const approvedPost = async (req, res) => {
     }
     const invoiceId = posting.invoiceId;
     const link = await paypal.changeInvoiceStatusToUNPAID(invoiceId);
+    // console.log("link :",link);
+
     if (posting.status != "pending") {
       res.status(200).json({
         message: "Only pending post can do this. Please check again",
@@ -127,6 +133,9 @@ const approvedPost = async (req, res) => {
     posting.status = "approved";
 
     const updatePost = await posting.save();
+
+    await sendEmail(posting, link);
+
     res.status(200).json({
       message: "update successfully",
       data: updatePost,
@@ -337,13 +346,13 @@ const updatePosting = async (req, res) => {
 
     const updatedPosting = await posting.save();
 
-    // Update Redis cache
-    const postings = await client.get("postings");
-    if (postings !== null) {
-      await client.del("postings", (err) => {
-        if (err) throw err;
-      });
-    }
+    // // Update Redis cache
+    // const postings = await client.get("postings");
+    // if (postings !== null) {
+    //   await client.del("postings", (err) => {
+    //     if (err) throw err;
+    //   });
+    // }
 
     res.status(200).json(updatedPosting);
   } catch (error) {
@@ -370,13 +379,13 @@ const deletePosting = async (req, res) => {
 
     const updatedPosting = await posting.save();
 
-    // Delete the posting from Redis cache
-    const postings = await client.get("postings");
-    if (postings !== null) {
-      await client.del("postings", (err) => {
-        if (err) throw err;
-      });
-    }
+    // // Delete the posting from Redis cache
+    // const postings = await client.get("postings");
+    // if (postings !== null) {
+    //   await client.del("postings", (err) => {
+    //     if (err) throw err;
+    //   });
+    // }
     res.status(200).json(updatedPosting);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -396,5 +405,5 @@ module.exports = {
   getPostingPending,
   getPostingApproved,
   getPostingRejected,
-  getAllStatus
+  getAllStatus,
 };

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const app = require("./app");
 require("dotenv").config();
-const redis = require('async-redis');
+// const redis = require('async-redis');
 
 // tạo Redis client instance
 // const client = redis.createClient({
@@ -11,17 +11,17 @@ const redis = require('async-redis');
 //         port: process.env.REDIS_PORT
 //     }
 // });
-const client = redis.createClient({
-  url: process.env.REDIS_URL,
-});
-// kết nối tới Redis server
-client.on("connect", () => {
-  console.log("Connected to Redis server");
-});
+// const client = redis.createClient({
+//   url: process.env.REDIS_URL,
+// });
+// // kết nối tới Redis server
+// client.on("connect", () => {
+//   console.log("Connected to Redis server");
+// });
 
-client.on("error", (err) => {
-  console.error(err);
-});
+// client.on("error", (err) => {
+//   console.error(err);
+// });
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI, {
