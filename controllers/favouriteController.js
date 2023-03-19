@@ -23,6 +23,15 @@ const createFavouritePosting = async (req, res) => {
     const user = req.user.id;
     const post = req.body.postId;
 
+    // Kiểm tra xem đã tồn tại một mục yêu thích cho bài đăng này chưa
+    const existingFavorite = await Favourite.findOne({ user: user, post: post });
+    if (existingFavorite) {
+      return res.status(400).json({
+        status: "Fail",
+        messages: "This post has already been favorited by the user",
+      });
+    }
+
     const favorite = new Favourite({
       user: user,
       post: post,
@@ -42,6 +51,7 @@ const createFavouritePosting = async (req, res) => {
     });
   }
 };
+
 
 const deleteFavourite = async (req, res) => {
     const favouriteId = req.params.id;
