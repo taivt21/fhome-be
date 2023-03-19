@@ -10,6 +10,7 @@ const roomRoutes = require("./routes/roomRoutes");
 const buildingRoutes = require("./routes/buildingRoutes");
 const notiRoutes = require("./routes/notiRoutes");
 const postingCommentRoutes = require("./routes/postingCommentRoutes");
+const favouriteRoutes = require("./routes/favouriteRoutes");
 
 const testRoutes = require("./routes/testRoute");
 
@@ -36,7 +37,7 @@ app.use("/", roomRoutes);
 app.use("/", buildingRoutes);
 app.use("/", notiRoutes);
 app.use("/", postingCommentRoutes);
-
+app.use("/", favouriteRoutes);
 app.use("/test", testRoutes);
 
 // Set up error handling middleware

@@ -1,17 +1,11 @@
-const admin = require("firebase-admin");
-
-// Đường dẫn tới tệp JSON chứa thông tin xác thực Firebase của bạn
-// const serviceAccount = require('../config/serviceAccount.json');
-
-// admin.initializeApp({
-//   credential: admin.credential.cert(serviceAccount)
-// });
+// const admin = require("firebase-admin");
+const axios = require('axios');
 
 // Hàm gửi thông báo push đến một thiết bị cụ thể
-const sendNotification = (deviceToken, title, message) => {
-  const axios = require('axios');
+const sendNotification = ( title, message) => {
 const serverKey = process.env.SERVER_KEY; // Server key from Firebase console
-const deviceToken = 'device-token'; // Device token from the client app
+const deviceToken = req.body.deviceToken || "eiu1k7EfSIyTdBKl2q7ly3:APA91bE8PSetGf1Bu-F53KZkIgtnrKLGprFhXzLmVMlpHO25jigofisXzvEk121yBX7tjPBJXNGb7JVHr3yw7rYz-wZBJM0-0y3U93HrF4rGwTLtKihYfx93ZdTjRxoLVBWT7-4GyJbH";
+
 
 const data = {
   notification: {
