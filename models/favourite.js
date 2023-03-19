@@ -8,7 +8,7 @@ const FavoriteSchema = new mongoose.Schema(
     },
     post: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Posts",
+      ref: "Postings",
     },
   },
   { timestamps: true }

@@ -17,10 +17,11 @@ const getFavouriteByUserId = async (req, res) => {
     });
   }
 };
+
 const createFavouritePosting = async (req, res) => {
   try {
     const user = req.user.id;
-    const post = req.body.id;
+    const post = req.body.postId;
 
     const favorite = new Favourite({
       user: user,
@@ -65,6 +66,8 @@ const deleteFavourite = async (req, res) => {
       });
     }
   };
+
+
 
 module.exports = {
   getFavouriteByUserId,
