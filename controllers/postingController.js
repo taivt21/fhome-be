@@ -19,23 +19,6 @@ const createPosting = async (req, res) => {
   }
 
   try {
-    const user = await Users.findById(req.user.id);
-
-    if (user.phoneNumber.length <= 0) {
-      res.status(500).json({
-        message: "Please update your phone number",
-      });
-      return;
-    }
-
-    const hoadon = await paypal.createDraftInvoice(
-      user.fullname,
-      user.email,
-      user.phoneNumber
-    );
-
-    const hoaDonId = hoadon.href.split("/")[6];
-
     // Create a new post
     const post = new Postings({
       title: req.body.title,
@@ -44,7 +27,6 @@ const createPosting = async (req, res) => {
       rooms: req.body.rooms,
       userPosting: req.user.id,
       img: req.body.img,
-      invoiceId: hoaDonId,
     });
 
     // Save the post to the database
@@ -71,6 +53,23 @@ const createPosting = async (req, res) => {
   }
 };
 const confirmPost = async (req, res) => {
+  const user = await Users.findById(req.user.id);
+
+  if (user.phoneNumber.length <= 0) {
+    res.status(500).json({
+      message: "Please update your phone number",
+    });
+    return;
+  }
+
+  const hoadon = await paypal.createDraftInvoice(
+    user.fullname,
+    user.email,
+    user.phoneNumber
+  );
+
+  const hoaDonId = hoadon.href.split("/")[6];
+
   const posting = await Postings.findById(req.params.id).populate(
     "userPosting"
   );
@@ -93,9 +92,13 @@ const confirmPost = async (req, res) => {
     }
 
     posting.status = "pending";
+    posting.invoiceId = hoaDonId;
+
     const updatePost = await posting.save();
-    await sendEmail(posting);
-    await sendNotification();
+
+    const statusMail = "confirm";
+    await sendEmail(statusMail, posting);
+    sendNotification();
 
     res.status(200).json({
       message: "Update successful, Please wait for admin to approve",
@@ -132,7 +135,8 @@ const approvedPost = async (req, res) => {
 
     const updatePost = await posting.save();
 
-    await sendEmail(posting, link);
+    const statusMail = "approved";
+    await sendEmail(statusMail, posting, link);
 
     res.status(200).json({
       message: "update successfully",
@@ -346,7 +350,9 @@ const updatePosting = async (req, res) => {
 };
 const rejectPost = async (req, res) => {
   try {
-    const posting = await Postings.findById(req.params.id);
+    const posting = await Postings.findById(req.params.id).populate(
+      "userPosting"
+    );
 
     if (!posting) {
       return res.status(404).json({ message: "Post not found" });
@@ -359,6 +365,10 @@ const rejectPost = async (req, res) => {
     posting.status = "rejected";
 
     const updatedPosting = await posting.save();
+
+    const statusMail = "rejected";
+    const link = "";
+    await sendEmail(statusMail, posting, link);
 
     res.status(200).json(updatedPosting);
   } catch (error) {
