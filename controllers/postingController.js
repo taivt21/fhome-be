@@ -5,6 +5,7 @@ require("dotenv").config();
 const paypal = require("../middlewares/paypal");
 const Users = require("../models/user");
 const sendEmail = require("../utils/sendmail");
+const { sendNotification } = require("./pushNotification");
 // tạo Redis client instance
 // const client = redis.createClient({
 //   url: process.env.REDIS_URL,
@@ -96,6 +97,7 @@ const confirmPost = async (req, res) => {
     posting.status = "pending";
     const updatePost = await posting.save();
     await sendEmail(posting);
+    await sendNotification();
 
     res.status(200).json({
       message: "update successfully",

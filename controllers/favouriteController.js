@@ -18,6 +18,22 @@ const getFavouriteByUserId = async (req, res) => {
   }
 };
 
+const getFavouriteByPost = async (req, res) => {
+  try {
+    const favourite = await Favourite.find({ post: req.params.id });
+    res.status(200).json({
+      status: "Success",
+      messages: "Get favourite by postId successfully!",
+      data: { favourite },
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "Fail",
+      messages: err.message,
+    });
+  }
+}
+
 const createFavouritePosting = async (req, res) => {
   try {
     const user = req.user.id;
@@ -83,4 +99,5 @@ module.exports = {
   getFavouriteByUserId,
   createFavouritePosting,
   deleteFavourite,
+  getFavouriteByPost,
 };

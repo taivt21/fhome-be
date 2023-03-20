@@ -7,6 +7,8 @@ router.post("/createFavouritePost", authenticate, favouriteController.createFavo
 
 router.get("/getFavouriteByUser", authenticate, favouriteController.getFavouriteByUserId);
 
+router.get("/getFavouriteByPost/:id", authenticate, favouriteController.getFavouriteByPost);
+
 router.delete("/deleteFavouritePost/:id", authenticate, favouriteController.deleteFavourite);
 
 module.exports = router
