@@ -32,7 +32,7 @@ app.use(bodyParser.json());
 
 app.use("/", userRoutes);
 app.use("/", authRoutes);
-app.use("/", postingRoutes);
+app.use("/posts", postingRoutes);
 app.use("/", roomRoutes);
 app.use("/", buildingRoutes);
 app.use("/", notiRoutes);

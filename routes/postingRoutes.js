@@ -3,38 +3,38 @@ const postingController = require("../controllers/postingController");
 const authenticate = require("../middlewares/authenticate");
 const uploadImage = require("../middlewares/uploadImage");
 const router = express.Router();
-
+//create post
 router.post(
-  "/createPosting",
+  "/create",
   authenticate,
   uploadImage,
   postingController.createPosting
 );
-
-router.get("/getAllPostings", postingController.getAllPostings);
-
-router.get(
-  "/getPostingByUserId",
-  authenticate,
-  postingController.getPostingByUserId
-);
-
-router.get("/getPostingById/:id", postingController.getPostingById);
-
-router.get("/getDraft", postingController.getPostingDraft);
-router.get("/getPending", postingController.getPostingPending);
-router.get("/getApproved", postingController.getPostingApproved);
-router.get("/getRejected", postingController.getPostingRejected);
-router.get("/getAllStatus", postingController.getAllStatus);
-
-
-router.put("/updatePosting/:id", postingController.updatePosting);
-
-// router.put('/setStatusPosting/:id', postingController.setStatusPosting)
-
-router.delete("/deletePosting/:id", postingController.deletePosting);
-
-router.put("/confirm-post/:id", postingController.confirmPost);
-router.put("/approve-post/:id", postingController.approvedPost);
+// get user post
+router.get("/user", authenticate, postingController.getUserPosts);
+// get post by id
+router.get("/detail/:id", authenticate, postingController.getPostingById);
+// get all posts
+router.get("/", authenticate, postingController.getAllStatus);
+// get published posts
+router.get("/published", authenticate, postingController.getAllPostings);
+// get draft posts
+router.get("/draft", authenticate, postingController.getPostingDraft);
+// get pending posts
+router.get("/pending", authenticate, postingController.getPostingPending);
+// get approved post
+router.get("/approved", authenticate, postingController.getPostingApproved);
+// get rejected post
+router.get("/rejected", authenticate, postingController.getPostingRejected);
+// update post
+router.put("/update/:id", authenticate, postingController.updatePosting);
+// reject post
+router.put("/reject/:id", authenticate, postingController.rejectPost);
+// confirm post
+router.put("/confirm/:id", authenticate, postingController.confirmPost);
+// approve post
+router.put("/approve/:id", authenticate, postingController.approvedPost);
+// delete post
+router.delete("/delete/:id", authenticate, postingController.deletePost);
 
 module.exports = router;
