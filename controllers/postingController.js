@@ -258,6 +258,7 @@ const getPostingRejected = async (req, res) => {
 };
 const getAllStatus = async (req, res) => {
   try {
+    await paypal.checkPublishedPost();
     const postings = await Postings.find().populate("userPosting");
     res.status(200).json({
       status: "Success",
