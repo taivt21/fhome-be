@@ -30,22 +30,11 @@ router.get("/invoices", async (req, res) => {
 
 router.get("/", async (req, res) => {
   try {
-    const response = await paypal.getListInvoices();
-    const listInvoice = response.items;
-    let posts = [];
-    for (let i = 0; i < listInvoice.length; i++) {
-      if (listInvoice[i].status === "PAID") {
-        posts = await Postings.find({ invoiceId: listInvoice[i].id });
-        // console.log("file: testRoute.js:39 ~ router.get ~ posts:", posts);
-        const updatePost = posts[0];
-        updatePost.status = "published";
-        await updatePost.save();
-      }
-    }
+    const response = await paypal.checkPublishedPost();
+
     res.status(200).json({
       msg: "success",
-      data: response.items,
-      post: posts,
+      data: response,
     });
   } catch (error) {
     res.status(500).json({

@@ -1,5 +1,6 @@
 require("dotenv").config();
 const axios = require("axios");
+const Postings = require("../models/posting");
 
 //Tạo số thứ tự hóa đơn
 const generatenextInvoiceNumber = async () => {
@@ -33,7 +34,7 @@ const createDraftInvoice = async (name, email, phone) => {
     const url = "https://api-m.sandbox.paypal.com/v2/invoicing/invoices";
 
     const today = new Date();
-    today.setDate(today.getDate() - 2); // giảm đi 2 ngày
+    today.setDate(today.getDate() - 1); // giảm đi 1 ngày
     const year = today.getFullYear();
     const month = (today.getMonth() + 1).toString().padStart(2, "0");
     const date = today.getDate().toString().padStart(2, "0");
@@ -257,8 +258,8 @@ async function checkPublishedPost() {
         Authorization: `Bearer ${token}`,
       },
     });
-    const listInvoice = response.items;
-    console.log(listInvoice);
+    const listInvoice = response.data.items;
+
     let posts = [];
     for (let i = 0; i < listInvoice.length; i++) {
       if (listInvoice[i].status === "PAID") {
@@ -269,8 +270,26 @@ async function checkPublishedPost() {
         await updatePost.save();
       }
     }
+    return response.data;
   } catch (error) {
     console.log(error.message);
+  }
+}
+async function getInvoiceDetail(hoadonId) {
+  const url = `https://api-m.sandbox.paypal.com/v2/invoicing/invoices/${hoadonId}`;
+  const token = await getAccessToken();
+  let result = "";
+  try {
+    const response = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    result = response.data;
+    return result;
+  } catch (error) {
+    console.log(error.message);
+    return result;
   }
 }
 
@@ -284,4 +303,5 @@ module.exports = {
   deleteInvoice,
   checkPublishedPost,
   getInvoiceDetail,
+  checkPublishedPost,
 };

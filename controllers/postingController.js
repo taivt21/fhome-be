@@ -171,7 +171,6 @@ const getAllPostings = async (req, res) => {
     });
     // }
   } catch (err) {
-    console.log(err);
     res.status(500).json({
       status: "Fail",
       messages: err.message,
@@ -183,10 +182,6 @@ const getPostingDraft = async (req, res) => {
     const postings = await Postings.find({ status: "draft" }).populate(
       "userPosting"
     );
-    console.log(
-      "file: postingController.js:201 ~ getPostingDraft ~ postings:",
-      postings
-    );
     // Save the fetched data to Redis cache
     // client.set("postings", JSON.stringify(postings));
     res.status(200).json({
@@ -195,7 +190,6 @@ const getPostingDraft = async (req, res) => {
     });
     // }
   } catch (err) {
-    console.log(err);
     res.status(500).json({
       status: "Fail",
       messages: err.message,
@@ -213,7 +207,6 @@ const getPostingPending = async (req, res) => {
     });
     // }
   } catch (err) {
-    console.log(err);
     res.status(500).json({
       status: "Fail",
       messages: err.message,
@@ -231,7 +224,6 @@ const getPostingApproved = async (req, res) => {
     });
     // }
   } catch (err) {
-    console.log(err.message);
     res.status(500).json({
       status: "Fail",
       messages: err,
@@ -249,7 +241,6 @@ const getPostingRejected = async (req, res) => {
     });
     // }
   } catch (err) {
-    console.log(err);
     res.status(500).json({
       status: "Fail",
       messages: err.message,
@@ -266,7 +257,6 @@ const getAllStatus = async (req, res) => {
     });
     // }
   } catch (err) {
-    console.log(err);
     res.status(500).json({
       status: "Fail",
       messages: err.message,
@@ -390,7 +380,6 @@ const deletePost = async (req, res, next) => {
       });
     }
   } catch (error) {
-    console.log(error.message);
     res.status(500).json({
       error: error,
     });
