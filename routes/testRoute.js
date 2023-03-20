@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const paypal = require("../middlewares/paypal");
+const Postings = require("../models/posting");
 
 router.get("/invoices", async (req, res) => {
   paypal;
@@ -30,9 +31,21 @@ router.get("/invoices", async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     const response = await paypal.getListInvoices();
+    const listInvoice = response.items;
+    let posts = [];
+    for (let i = 0; i < listInvoice.length; i++) {
+      if (listInvoice[i].status === "PAID") {
+        posts = await Postings.find({ invoiceId: listInvoice[i].id });
+        // console.log("file: testRoute.js:39 ~ router.get ~ posts:", posts);
+        const updatePost = posts[0];
+        updatePost.status = "published";
+        await updatePost.save();
+      }
+    }
     res.status(200).json({
       msg: "success",
-      data: response,
+      data: response.items,
+      post: posts,
     });
   } catch (error) {
     res.status(500).json({
