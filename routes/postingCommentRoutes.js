@@ -4,7 +4,16 @@ const authenticate = require("../middlewares/authenticate");
 const uploadImage = require("../middlewares/uploadImage");
 const router = express.Router();
 
-router.get('/getAllPostingCommentByPost/:id',authenticate,postingCommentController.getAllPostingCommentByPost),
-router.post('/postAllPostingCommentByPost',authenticate,uploadImage,postingCommentController.createPostingComment)
+router.get(
+  "/getAllPostingCommentByPost/:id",
+  authenticate,
+  postingCommentController.getAllPostingCommentByPost
+),
+  router.post(
+    "/postAllPostingCommentByPost",
+    authenticate,
+    uploadImage,
+    postingCommentController.createPostingComment
+  );
 
-module.exports = router
+module.exports = router;

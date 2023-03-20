@@ -70,9 +70,10 @@ const createPosting = async (req, res) => {
     });
   }
 };
-
 const confirmPost = async (req, res) => {
-  const posting = await Postings.findById(req.params.id).populate("userPosting");
+  const posting = await Postings.findById(req.params.id).populate(
+    "userPosting"
+  );
 
   if (!posting) {
     res.status(404).json({
@@ -81,9 +82,6 @@ const confirmPost = async (req, res) => {
   }
 
   try {
-    // const invoiceId = posting.invoiceId;
-    // const link = await paypal.changeInvoiceStatusToUNPAID(invoiceId);
-
     if (
       posting.status == "approved" ||
       posting.status == "pending" ||
@@ -100,9 +98,8 @@ const confirmPost = async (req, res) => {
     await sendNotification();
 
     res.status(200).json({
-      message: "update successfully",
+      message: "Update successful, Please wait for admin to approve",
       data: updatePost,
-      // link: link,
     });
   } catch (error) {
     res.status(500).json({
@@ -111,7 +108,6 @@ const confirmPost = async (req, res) => {
     });
   }
 };
-
 const approvedPost = async (req, res) => {
   try {
     const posting = await Postings.findById(req.params.id).populate(
@@ -150,30 +146,12 @@ const approvedPost = async (req, res) => {
     });
   }
 };
-
 const getAllPostings = async (req, res) => {
   try {
-    // Check if the data exists in the cache
-    // const postings = await client.get("postings");
-
-    // if (postings !== null) {
-    //   // If data exists in cache, return it
-
-    //   const parsedPostings = JSON.parse(postings);
-    //   res.status(200).json({
-    //     status: "Success",
-    //     messages: "Get posts successfully from cache!",
-    //     data: { postings: parsedPostings },
-    //   });
-    // }
-    // else {
-    // If data does not exist in cache, fetch from the database
-
     const listpost = await Postings.find({ status: "approved" });
 
     listpost.forEach(async (post) => {
       const hoadon = await paypal.getInvoiceDetail(post.invoiceId);
-
       if (hoadon.status === "PAID") {
         post.status = "published";
         post.save();
@@ -181,8 +159,7 @@ const getAllPostings = async (req, res) => {
     });
 
     const postings = await Postings.find({ status: "published" });
-    // Save the fetched data to Redis cache
-    // client.set("postings", JSON.stringify(postings));
+
     res.status(200).json({
       status: "Success",
       messages: "Get posts successfully from database!",
@@ -197,10 +174,15 @@ const getAllPostings = async (req, res) => {
     });
   }
 };
-
 const getPostingDraft = async (req, res) => {
   try {
-    const postings = await Postings.find({ status: "draft" }).populate("userPosting");
+    const postings = await Postings.find({ status: "draft" }).populate(
+      "userPosting"
+    );
+    console.log(
+      "file: postingController.js:201 ~ getPostingDraft ~ postings:",
+      postings
+    );
     // Save the fetched data to Redis cache
     // client.set("postings", JSON.stringify(postings));
     res.status(200).json({
@@ -218,7 +200,9 @@ const getPostingDraft = async (req, res) => {
 };
 const getPostingPending = async (req, res) => {
   try {
-    const postings = await Postings.find({ status: "pending" }).populate("userPosting");
+    const postings = await Postings.find({ status: "pending" }).populate(
+      "userPosting"
+    );
     res.status(200).json({
       status: "Success",
       data: { postings },
@@ -234,23 +218,27 @@ const getPostingPending = async (req, res) => {
 };
 const getPostingApproved = async (req, res) => {
   try {
-    const postings = await Postings.find({ status: "approved" }).populate("userPosting");
+    const postings = await Postings.find({ status: "approved" }).populate(
+      "userPosting"
+    );
     res.status(200).json({
       status: "Success",
       data: { postings },
     });
     // }
   } catch (err) {
-    console.log(err);
+    console.log(err.message);
     res.status(500).json({
       status: "Fail",
-      messages: err.message,
+      messages: err,
     });
   }
 };
 const getPostingRejected = async (req, res) => {
   try {
-    const postings = await Postings.find({ status: "rejected" }).populate("userPosting");
+    const postings = await Postings.find({ status: "rejected" }).populate(
+      "userPosting"
+    );
     res.status(200).json({
       status: "Success",
       data: { postings },
@@ -280,8 +268,7 @@ const getAllStatus = async (req, res) => {
     });
   }
 };
-
-const getPostingByUserId = async (req, res) => {
+const getUserPosts = async (req, res) => {
   try {
     const postings = await Postings.find({ userPosting: req.user.id }).populate(
       "buildings rooms"
@@ -298,10 +285,14 @@ const getPostingByUserId = async (req, res) => {
     });
   }
 };
-
 const getPostingById = async (req, res) => {
   try {
     const posting = await Postings.findById(req.params.id);
+    if (!posting) {
+      res.status(404).json({
+        message: "posting not found",
+      });
+    }
     res.status(200).json({
       status: "Success",
       messages: "Get post successfully!",
@@ -348,24 +339,12 @@ const updatePosting = async (req, res) => {
 
     const updatedPosting = await posting.save();
 
-    // // Update Redis cache
-    // const postings = await client.get("postings");
-    // if (postings !== null) {
-    //   await client.del("postings", (err) => {
-    //     if (err) throw err;
-    //   });
-    // }
-
-    res.status(200).json(updatedPosting);
+    res.status(200).json({ message: "update success", data: updatedPosting });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
-
-// kiểm tra nếu có dữ liệu thì tiến hành xoá bản ghi tương ứng
-// với id bằng cách sử dụng Array.filter
-
-const deletePosting = async (req, res) => {
+const rejectPost = async (req, res) => {
   try {
     const posting = await Postings.findById(req.params.id);
 
@@ -381,26 +360,38 @@ const deletePosting = async (req, res) => {
 
     const updatedPosting = await posting.save();
 
-    // // Delete the posting from Redis cache
-    // const postings = await client.get("postings");
-    // if (postings !== null) {
-    //   await client.del("postings", (err) => {
-    //     if (err) throw err;
-    //   });
-    // }
     res.status(200).json(updatedPosting);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
-
+const deletePost = async (req, res, next) => {
+  try {
+    const post = await Postings.findById(req.params.id);
+    if (!post) {
+      res.status(404).json({ message: "No posts found" });
+    } else {
+      const hoadonId = post.invoiceId;
+      await paypal.deleteInvoice(hoadonId);
+      await post.remove();
+      res.status(200).json({
+        message: "delete post success",
+      });
+    }
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      error: error,
+    });
+  }
+};
 module.exports = {
   createPosting,
   getAllPostings,
   getPostingById,
   updatePosting,
-  deletePosting,
-  getPostingByUserId,
+  rejectPost,
+  getUserPosts,
   confirmPost,
   approvedPost,
   getPostingDraft,
@@ -408,4 +399,5 @@ module.exports = {
   getPostingApproved,
   getPostingRejected,
   getAllStatus,
+  deletePost,
 };
