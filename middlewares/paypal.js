@@ -33,7 +33,7 @@ const createDraftInvoice = async (name, email, phone) => {
     const url = "https://api-m.sandbox.paypal.com/v2/invoicing/invoices";
 
     const today = new Date();
-    today.setDate(today.getDate() - 1); // giảm đi 1 ngày
+    today.setDate(today.getDate() - 2); // giảm đi 2 ngày
     const year = today.getFullYear();
     const month = (today.getMonth() + 1).toString().padStart(2, "0");
     const date = today.getDate().toString().padStart(2, "0");
@@ -248,7 +248,7 @@ async function getListInvoices() {
   }
 }
 
-async function getInvoiceDetail(hoadonId) {
+async function checkPublishedPost(hoadonId) {
   const url = `https://api-m.sandbox.paypal.com/v2/invoicing/invoices/${hoadonId}`;
   const token = await getAccessToken();
   let result = "";
@@ -258,11 +258,19 @@ async function getInvoiceDetail(hoadonId) {
         Authorization: `Bearer ${token}`,
       },
     });
-    result = response.data;
-    return result;
+    const listInvoice = response.items;
+    let posts = [];
+    for (let i = 0; i < listInvoice.length; i++) {
+      if (listInvoice[i].status === "PAID") {
+        posts = await Postings.find({ invoiceId: listInvoice[i].id });
+        // console.log("file: testRoute.js:39 ~ router.get ~ posts:", posts);
+        const updatePost = posts[0];
+        updatePost.status = "published";
+        await updatePost.save();
+      }
+    }
   } catch (error) {
     console.log(error.message);
-    return result;
   }
 }
 
