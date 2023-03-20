@@ -71,7 +71,9 @@ const createPosting = async (req, res) => {
 };
 
 const confirmPost = async (req, res) => {
-  const posting = await Postings.findById(req.params.id).populate("userPosting");
+  const posting = await Postings.findById(req.params.id).populate(
+    "userPosting"
+  );
 
   if (!posting) {
     res.status(404).json({
@@ -80,8 +82,8 @@ const confirmPost = async (req, res) => {
   }
 
   try {
-    // const invoiceId = posting.invoiceId;
-    // const link = await paypal.changeInvoiceStatusToUNPAID(invoiceId);
+    const invoiceId = posting.invoiceId;
+    const link = await paypal.changeInvoiceStatusToUNPAID(invoiceId);
 
     if (
       posting.status == "approved" ||
@@ -100,7 +102,7 @@ const confirmPost = async (req, res) => {
     res.status(200).json({
       message: "update successfully",
       data: updatePost,
-      // link: link,
+      link: link,
     });
   } catch (error) {
     res.status(500).json({
@@ -198,7 +200,9 @@ const getAllPostings = async (req, res) => {
 
 const getPostingDraft = async (req, res) => {
   try {
-    const postings = await Postings.find({ status: "draft" }).populate("userPosting");
+    const postings = await Postings.find({ status: "draft" }).populate(
+      "userPosting"
+    );
     // Save the fetched data to Redis cache
     // client.set("postings", JSON.stringify(postings));
     res.status(200).json({
@@ -216,7 +220,9 @@ const getPostingDraft = async (req, res) => {
 };
 const getPostingPending = async (req, res) => {
   try {
-    const postings = await Postings.find({ status: "pending" }).populate("userPosting");
+    const postings = await Postings.find({ status: "pending" }).populate(
+      "userPosting"
+    );
     res.status(200).json({
       status: "Success",
       data: { postings },
@@ -232,7 +238,9 @@ const getPostingPending = async (req, res) => {
 };
 const getPostingApproved = async (req, res) => {
   try {
-    const postings = await Postings.find({ status: "approved" }).populate("userPosting");
+    const postings = await Postings.find({ status: "approved" }).populate(
+      "userPosting"
+    );
     res.status(200).json({
       status: "Success",
       data: { postings },
@@ -248,7 +256,9 @@ const getPostingApproved = async (req, res) => {
 };
 const getPostingRejected = async (req, res) => {
   try {
-    const postings = await Postings.find({ status: "rejected" }).populate("userPosting");
+    const postings = await Postings.find({ status: "rejected" }).populate(
+      "userPosting"
+    );
     res.status(200).json({
       status: "Success",
       data: { postings },
