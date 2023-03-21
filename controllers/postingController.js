@@ -250,7 +250,7 @@ const getPostingRejected = async (req, res) => {
 const getAllStatus = async (req, res) => {
   try {
     await paypal.checkPublishedPost();
-    const postings = await Postings.find().populate("userPosting");
+    const postings = await Postings.find().populate("userPosting buildings rooms");
     res.status(200).json({
       status: "Success",
       data: { postings },
@@ -266,7 +266,7 @@ const getAllStatus = async (req, res) => {
 const getUserPosts = async (req, res) => {
   try {
     const postings = await Postings.find({ userPosting: req.user.id }).populate(
-      "buildings rooms"
+      "buildings rooms userPosting"
     );
     res.status(200).json({
       status: "Success",
