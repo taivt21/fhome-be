@@ -260,14 +260,13 @@ async function checkPublishedPost() {
     });
     const listInvoice = response.data.items;
 
-    let posts = [];
     for (let i = 0; i < listInvoice.length; i++) {
       if (listInvoice[i].status === "PAID") {
-        posts = await Postings.find({ invoiceId: listInvoice[i].id });
-        // console.log("file: testRoute.js:39 ~ router.get ~ posts:", posts);
-        const updatePost = posts[0];
-        updatePost.status = "published";
-        await updatePost.save();
+        post = await Postings.findOne({ invoiceId: listInvoice[i].id });
+        if (post !== null) {
+          const updatePost = posts;
+          updatePost.status = "published";
+          await updatePost.save();        }
       }
     }
     return response.data;
@@ -292,8 +291,6 @@ async function getInvoiceDetail(hoadonId) {
     return result;
   }
 }
-
-
 
 module.exports = {
   generatenextInvoiceNumber,
