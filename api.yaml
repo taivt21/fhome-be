@@ -1,0 +1,1342 @@
+openapi: 3.0.0
+info:
+  title: F_homes
+  description: This is api for my team project
+  version: 1.0.0
+servers:
+  # - url: https://virtserver.swaggerhub.com/DINHTUNANN161/F_homes/1.0.0
+  #   description: SwaggerHub API Auto Mocking
+  - url: http://localhost:3000/
+paths:
+  /login:
+    post:
+      tags:
+        - Authorization
+      summary: Logs user into the system
+      description: ""
+      operationId: loginUser
+      requestBody:
+        description: Add your accessToken
+        content:
+          application/json:
+            schema:
+              example:
+                accessToken: your Token
+      responses:
+        "200":
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_400"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_401"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_404"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_500"
+      x-swagger-router-controller: Authorization
+  /getUser:
+    get:
+      tags:
+        - User
+      summary: Finds All User
+      description: Multiple status values can be provided with comma separated strings
+      operationId: findUser
+      responses:
+        "200":
+          description: Get users successfully!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/inline_response_200_1"
+                x-content-type: application/json
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_404_1"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_500"
+      x-swagger-router-controller: User
+  /setUserStatus/{userID}:
+    put:
+      tags:
+        - User
+      summary: Update user status
+      description: This can only be done by the logged in user.
+      operationId: updateUserStatus
+      parameters:
+        - name: userID
+          in: path
+          description: name that need to be update
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      requestBody:
+        description: Update an user status in the data
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+          application/xml:
+            schema:
+              $ref: "#/components/schemas/User"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "200":
+          description: User status updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_2"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_404_1"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_500"
+      x-swagger-router-controller: User
+  /deleteUser/{userID}:
+    delete:
+      tags:
+        - User
+      summary: Change user status become inactive
+      description: This can only be done by the logged in.
+      operationId: deleteUser
+      parameters:
+        - name: userID
+          in: path
+          description: The name that needs to be deleted
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_404_1"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_500"
+      x-swagger-router-controller: User
+  /users:
+    get:
+      tags:
+        - User
+      summary: Finds All User
+      description: Multiple status values can be provided with comma separated strings
+      operationId: findUserWithAuth
+      responses:
+        "200":
+          description: Get users successfully!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/inline_response_200_1"
+                x-content-type: application/json
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_400"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_401"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_404"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_500"
+      security:
+        - BasicAuth: []
+      x-swagger-router-controller: User
+    post:
+      tags:
+        - User
+      summary: Create user
+      description: This can only be done by the logged in user.
+      operationId: createUser
+      requestBody:
+        description: Create a user
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+          application/xml:
+            schema:
+              $ref: "#/components/schemas/User"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        default:
+          description: successful operation
+        "201":
+          description: Create users successfully!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/inline_response_200_1"
+                x-content-type: application/json
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_400"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_401"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_404"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_500"
+      security:
+        - BasicAuth: []
+      x-swagger-router-controller: User
+  /users/{userID}:
+    get:
+      tags:
+        - User
+      summary: Get user by user id
+      description: ""
+      operationId: getUserById
+      parameters:
+        - name: userID
+          in: path
+          description: "The name that needs to be fetched. Use user1 for testing. "
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Get users successfully!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/inline_response_200_1"
+                x-content-type: application/json
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_400"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_401"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_404"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_500"
+      security:
+        - BasicAuth: []
+      x-swagger-router-controller: User
+    put:
+      tags:
+        - User
+      summary: Update user
+      description: This can only be done by the logged in user.
+      operationId: updateUserWithAuth
+      parameters:
+        - name: userID
+          in: path
+          description: name that need to be update
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      requestBody:
+        description: Update an existent user in the data
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+          application/xml:
+            schema:
+              $ref: "#/components/schemas/User"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "200":
+          description: Update users successfully!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/inline_response_200_1"
+                x-content-type: application/json
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_400"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_401"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_404"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_500"
+      security:
+        - BasicAuth: []
+      x-swagger-router-controller: userRoutes
+    delete:
+      tags:
+        - User
+      summary: Delete user
+      description: This can only be done by the logged in user.
+      operationId: deleteUserwithinAuth
+      parameters:
+        - name: userID
+          in: path
+          description: The name that needs to be deleted
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Users change status inactive successfully!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/inline_response_200_1"
+                x-content-type: application/json
+        "400":
+          description: Invalid username supplied
+        "401":
+          description: Server requires authentication for client request
+        "403":
+          description: Client has been identified but has no access rights
+        "404":
+          description: User not found
+        "500":
+          description: Internal Server Error
+      security:
+        - BasicAuth: []
+      x-swagger-router-controller: User
+  /postingNew:
+    post:
+      tags:
+        - Posting
+      summary: create new posting
+      description: ""
+      operationId: UserPosting
+      requestBody:
+        description: create a new post
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Posting"
+          application/xml:
+            schema:
+              $ref: "#/components/schemas/Posting"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/Posting"
+      responses:
+        "201":
+          description: Post created successfully!
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_400"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_401"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_404"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_500"
+      security:
+        - BasicAuth: []
+      x-swagger-router-controller: Posting
+  /getAllPostings:
+    get:
+      tags:
+        - Posting
+      summary: Finds All Posting
+      description: Multiple status values can be provided with comma separated strings
+      operationId: findAllPosting
+      responses:
+        "200":
+          description: Get posts successfully!
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Posting"
+                x-content-type: application/json
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Posting"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_404_2"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_500"
+      x-swagger-router-controller: Posting
+  /getPostingByUserId:
+    get:
+      tags:
+        - Posting
+      summary: Get all postings
+      description: Get all postings either from cache or database
+      operationId: getPostingByUserIdGET
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_3"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_500_1"
+      security:
+        - BasicAuth: []
+      x-swagger-router-controller: Posting
+  /getPostingById/{PostingId}:
+    get:
+      tags:
+        - Posting
+      summary: Get Posting by user id
+      description: ""
+      operationId: getPostingById
+      parameters:
+        - name: PostingId
+          in: path
+          description: "The name that needs to be fetched. Use user1 for testing. "
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Posting"
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/Posting"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_404_3"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_500"
+      x-swagger-router-controller: Posting
+  /updatePosting/{PostingId}:
+    put:
+      tags:
+        - Posting
+      summary: Update Posting
+      description: This can only be done by the logged in user.
+      operationId: updatePostingWithAuth
+      parameters:
+        - name: PostingId
+          in: path
+          description: name that need to be update
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      requestBody:
+        description: Update an existent user in the data
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Posting"
+          application/xml:
+            schema:
+              $ref: "#/components/schemas/Posting"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/Posting"
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Posting"
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/Posting"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_404_3"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_500"
+      x-swagger-router-controller: Posting
+  /deletePosting/{PostingId}:
+    delete:
+      tags:
+        - Posting
+      summary: Delete Posting
+      description: This can only be done by the logged in user.
+      operationId: deletePostingwithinAuth
+      parameters:
+        - name: PostingId
+          in: path
+          description: The id that needs to be deleted
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Posting deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Posting"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_404_3"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_500"
+      x-swagger-router-controller: Posting
+  /getRooms:
+    get:
+      tags:
+        - Room
+      summary: Finds All Room
+      description: Multiple status values can be provided with comma separated strings
+      operationId: findAllRoom
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Room"
+                x-content-type: application/json
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Room"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_500_2"
+      x-swagger-router-controller: Room
+  /rooms:
+    post:
+      tags:
+        - Room
+      summary: Update a file
+      description: Update a file by its ID
+      operationId: roomsPOST
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/rooms_body"
+        required: true
+      responses:
+        "200":
+          description: Room created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_4"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_404_4"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_500"
+      x-swagger-router-controller: Room
+  /getRoomsByUserId:
+    get:
+      tags:
+        - Room
+      summary: Get rooms by user id
+      operationId: getRoomsByUserIdGET
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_5"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_500_1"
+      security:
+        - BasicAuth: []
+      x-swagger-router-controller: Room
+  /updateRoom/{id}:
+    put:
+      tags:
+        - Room
+      summary: Update a room by id
+      operationId: updateRoomIdPUT
+      parameters:
+        - name: id
+          in: path
+          description: ID of the room to update
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/updateRoom_id_body"
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_6"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_400"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_401"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_500_1"
+      security:
+        - BasicAuth: []
+      x-swagger-router-controller: Room
+  /rooms/{id}:
+    delete:
+      tags:
+        - Room
+      summary: Delete room by ID
+      description: Delete room by ID
+      operationId: roomsIdDELETE
+      parameters:
+        - name: id
+          in: path
+          description: ID of the room to delete
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Room deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_200_7"
+        "404":
+          description: Room not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_404_5"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_500_3"
+      x-swagger-router-controller: Room
+  /getBuilding:
+    get:
+      tags:
+        - Building
+      summary: Finds All Building
+      description: Multiple status values can be provided with comma separated strings
+      operationId: findAllBuilding
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Building"
+                x-content-type: application/json
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Building"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_400"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_401"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_404"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/inline_response_500"
+      x-swagger-router-controller: Building
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        email:
+          type: string
+          description: admin email
+        phoneNumber:
+          type: string
+          description: admin phone number
+        _ID:
+          type: string
+          description: admin ID
+        fullname:
+          type: string
+          description: Name
+        status:
+          type: boolean
+          description: status
+        roleName:
+          type: string
+          description: status
+        __v:
+          type: number
+      example:
+        _ID: adminID
+        FullName: adminName
+        password: password
+        phoneNum: phoneNum
+        email: email
+        status: true
+        roleName: fptmember
+    Posting:
+      type: object
+      properties:
+        title:
+          type: string
+          description: title
+        Description:
+          type: string
+          description: PostingDescription
+        buildings:
+          type: string
+          description: buildings
+        roomTypes:
+          type: string
+          description: type of room
+        userPosting:
+          type: string
+          description: user ID
+        img:
+          type: string
+          description: img
+      example:
+        img: img
+        Description: Description
+        roomTypes: roomTypes
+        buildings: buildings
+        userPosting: userPosting
+        title: title
+    Room:
+      type: object
+      properties:
+        Size:
+          type: string
+          description: PostingDescription
+        Price:
+          type: string
+          description: PostingDescription
+        Description:
+          type: string
+          description: PostingDescription
+        Status:
+          type: string
+          description: PostingDescription
+        Building:
+          type: string
+          description: PostingDescription
+        User:
+          type: string
+          description: user ID
+      example:
+        Status: Status
+        Building: Building
+        Description: Description
+        User: User
+        Price: Price
+        Size: Size
+    Building:
+      type: object
+      properties:
+        BuildingName:
+          type: string
+          description: Name of building
+        Address:
+          type: string
+          description: Address
+        Status:
+          type: boolean
+          description: status of building
+      example:
+        Status: true
+        Address: Address
+        BuildingName: BuildingName
+    inline_response_200:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Success
+        messages:
+          type: string
+          example: Login successfully!
+        data:
+          $ref: "#/components/schemas/User"
+      example:
+        data:
+          _ID: adminID
+          FullName: adminName
+          password: password
+          phoneNum: phoneNum
+          email: email
+          status: true
+          roleName: fptmember
+        messages: Login successfully!
+        status: Success
+    inline_response_400:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Fail
+        messages:
+          type: string
+          example: Access token is required!
+    inline_response_401:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Fail
+        messages:
+          type: string
+          example: Invalid access token!
+    inline_response_404:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Fail
+    inline_response_500:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Fail
+        messages:
+          type: string
+          example: Internal Server Error
+    inline_response_200_1:
+      type: object
+      properties:
+        status:
+          type: string
+        messages:
+          type: string
+        data:
+          $ref: "#/components/schemas/User"
+      example:
+        data:
+          _ID: adminID
+          FullName: adminName
+          password: password
+          phoneNum: phoneNum
+          email: email
+          status: true
+          roleName: fptmember
+        messages: messages
+        status: status
+    inline_response_404_1:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Fail
+        messages:
+          type: string
+          example: Can not find users
+    inline_response_200_2:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Success
+        messages:
+          type: string
+          example: User status updated successfully!
+        data:
+          $ref: "#/components/schemas/User"
+      example:
+        data:
+          _ID: adminID
+          FullName: adminName
+          password: password
+          phoneNum: phoneNum
+          email: email
+          status: true
+          roleName: fptmember
+        messages: User status updated successfully!
+        status: Success
+    inline_response_404_2:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Fail
+        messages:
+          type: string
+          example: Can not find any Post
+    inline_response_200_3:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Success
+        messages:
+          type: string
+          example: Get posts successfully from cache!
+        data:
+          $ref: "#/components/schemas/inline_response_200_3_data"
+      example:
+        data:
+          postings:
+            - img: img
+              Description: Description
+              roomTypes: roomTypes
+              buildings: buildings
+              userPosting: userPosting
+              title: title
+            - img: img
+              Description: Description
+              roomTypes: roomTypes
+              buildings: buildings
+              userPosting: userPosting
+              title: title
+        messages: Get posts successfully from cache!
+        status: Success
+    inline_response_500_1:
+      type: object
+      properties:
+        status:
+          type: string
+        messages:
+          type: string
+    inline_response_404_3:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Fail
+        messages:
+          type: string
+          example: Can not find Post
+    inline_response_500_2:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Fail
+        messages:
+          type: string
+          example: Internal Server Errorr
+    rooms_body:
+      type: object
+      properties:
+        img:
+          type: string
+          format: binary
+    inline_response_200_4:
+      type: object
+      properties:
+        status:
+          type: string
+          description: The status of the response
+          example: Success
+        message:
+          type: string
+          description: The message of the response
+          example: Room created successfully!
+        data:
+          $ref: "#/components/schemas/Room"
+      example:
+        data:
+          Status: Status
+          Building: Building
+          Description: Description
+          User: User
+          Price: Price
+          Size: Size
+        message: Room created successfully!
+        status: Success
+    inline_response_404_4:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Fail
+        messages:
+          type: string
+          example: Not found
+    inline_response_200_5:
+      type: object
+      properties:
+        status:
+          type: string
+        messages:
+          type: string
+        data:
+          $ref: "#/components/schemas/inline_response_200_5_data"
+      example:
+        data:
+          postings:
+            - Status: Status
+              Building: Building
+              Description: Description
+              User: User
+              Price: Price
+              Size: Size
+            - Status: Status
+              Building: Building
+              Description: Description
+              User: User
+              Price: Price
+              Size: Size
+        messages: messages
+        status: status
+    updateRoom_id_body:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        users:
+          type: array
+          items:
+            type: string
+    inline_response_200_6:
+      type: object
+      properties:
+        status:
+          type: string
+        messages:
+          type: string
+        data:
+          $ref: "#/components/schemas/Room"
+      example:
+        data:
+          Status: Status
+          Building: Building
+          Description: Description
+          User: User
+          Price: Price
+          Size: Size
+        messages: messages
+        status: status
+    inline_response_200_7:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Success
+        message:
+          type: string
+          example: "Room with id {id} has been deleted successfully"
+        data:
+          $ref: "#/components/schemas/inline_response_200_7_data"
+      example:
+        data:
+          room:
+            Status: Status
+            Building: Building
+            Description: Description
+            User: User
+            Price: Price
+            Size: Size
+        message: "Room with id {id} has been deleted successfully"
+        status: Success
+    inline_response_404_5:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Fail
+        message:
+          type: string
+          example: "Room with id {id} is not found"
+    inline_response_500_3:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Fail
+        message:
+          type: string
+          example: Error message
+    inline_response_200_3_data:
+      type: object
+      properties:
+        postings:
+          type: array
+          items:
+            $ref: "#/components/schemas/Posting"
+      example:
+        postings:
+          - img: img
+            Description: Description
+            roomTypes: roomTypes
+            buildings: buildings
+            userPosting: userPosting
+            title: title
+          - img: img
+            Description: Description
+            roomTypes: roomTypes
+            buildings: buildings
+            userPosting: userPosting
+            title: title
+    inline_response_200_5_data:
+      type: object
+      properties:
+        postings:
+          type: array
+          items:
+            $ref: "#/components/schemas/Room"
+      example:
+        postings:
+          - Status: Status
+            Building: Building
+            Description: Description
+            User: User
+            Price: Price
+            Size: Size
+          - Status: Status
+            Building: Building
+            Description: Description
+            User: User
+            Price: Price
+            Size: Size
+    inline_response_200_7_data:
+      type: object
+      properties:
+        room:
+          $ref: "#/components/schemas/Room"
+      example:
+        room:
+          Status: Status
+          Building: Building
+          Description: Description
+          User: User
+          Price: Price
+          Size: Size
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: "JWT,"
