@@ -17,12 +17,11 @@ const testRoutes = require("./routes/testRoute");
 app.use(cors());
 
 // Set up Swagger UI
-const YAML = require("yamljs");
 const swaggerUi = require("swagger-ui-express");
-const swaggerJsDocs = YAML.load("./api.yaml");
+const swaggerDocument = require("./swagger.json");
 
 // Call setSwaggerUI to set up Swagger UI
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerJsDocs));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Body parser middleware
 app.use(express.json());
