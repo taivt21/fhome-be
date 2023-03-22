@@ -47,4 +47,6 @@ router.delete("/deleteUser/:id", userController.deleteUser);
 //example http://localhost:3000/deleteUser/63fc6149d0db61d24a614b62
 
 
+router.get("/countUser", userController.countUsers);
+
 module.exports = router;

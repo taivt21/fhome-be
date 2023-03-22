@@ -262,8 +262,8 @@ async function checkPublishedPost() {
 
     for (let i = 0; i < listInvoice.length; i++) {
       if (listInvoice[i].status === "PAID") {
-        post = await Postings.findOne({ invoiceId: listInvoice[i].id });
-        if (post !== null) {
+        posts = await Postings.findOne({ invoiceId: listInvoice[i].id });
+        if (posts !== null) {
           const updatePost = posts;
           updatePost.status = "published";
           await updatePost.save();        }

@@ -250,7 +250,9 @@ const getPostingRejected = async (req, res) => {
 const getAllStatus = async (req, res) => {
   try {
     await paypal.checkPublishedPost();
-    const postings = await Postings.find().populate("userPosting buildings rooms");
+    const postings = await Postings.find().populate(
+      "userPosting buildings rooms"
+    );
     res.status(200).json({
       status: "Success",
       data: { postings },
@@ -385,6 +387,140 @@ const deletePost = async (req, res, next) => {
     });
   }
 };
+
+const countPosts = async (req, res, next) => {
+  var { year, month, day, status } = req.query;
+
+  if (!year) {
+    year = new Date().getFullYear();
+  }
+
+  // If month is not provided, count for the entire year
+  if (!month) {
+    const startOfYear = new Date(year, 0, 1);
+    const endOfYear = new Date(year, 11, 31);
+    endOfYear.setHours(23, 59, 59, 999);
+
+    const query = { createdAt: { $gte: startOfYear, $lte: endOfYear } };
+
+    if (status) {
+      query.status = status;
+    }
+
+    try {
+      const count = await Postings.countDocuments(query);
+      res.status(200).json({ count });
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ message: "Server Error" });
+    }
+  }
+
+  // If month is provided but day is not, count for the entire month
+  if (month && !day) {
+    const startOfMonth = new Date(year, month - 1, 1);
+    const endOfMonth = new Date(year, month, 0);
+    endOfMonth.setHours(23, 59, 59, 999);
+
+    const query = { createdAt: { $gte: startOfMonth, $lte: endOfMonth } };
+
+    if (status) {
+      query.status = status;
+    }
+
+    try {
+      const count = await Postings.countDocuments(query);
+      res.status(200).json({ count });
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ message: "Server Error" });
+    }
+  }
+
+  // If both month and day are provided, count for the specific day
+  if (month && day) {
+    const startOfDay = new Date(year, month - 1, day);
+    const endOfDay = new Date(year, month - 1, day);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const query = { createdAt: { $gte: startOfDay, $lte: endOfDay } };
+
+    if (status) {
+      query.status = status;
+    }
+
+    try {
+      const count = await Postings.countDocuments(query);
+      res.status(200).json({ count });
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ message: "Server Error" });
+    }
+  }
+};
+const countPostsByMonth = async (req, res, next) => {
+  const year = parseInt(req.query.year);
+  const month = parseInt(req.query.month);
+  const status = req.query.status;
+
+  const startOfMonth = new Date(year, month - 1, 1);
+  const endOfMonth = new Date(year, month, 0);
+  endOfMonth.setHours(23, 59, 59, 999);
+
+  const query = { createdAt: { $gte: startOfMonth, $lte: endOfMonth } };
+  if (status) {
+    // Nếu status được truyền vào
+    query.status = status; // Thêm điều kiện lọc theo status
+  }
+  try {
+    const count = await Postings.countDocuments(query);
+    res.status(200).json({ count });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+const countPostsByYear = async (req, res, next) => {
+  const year = parseInt(req.query.year);
+  const status = req.query.status;
+
+  const startOfYear = new Date(year, 0, 1);
+  const endOfYear = new Date(year, 11, 31);
+  endOfYear.setHours(23, 59, 59, 999);
+
+  const query = { createdAt: { $gte: startOfYear, $lte: endOfYear } };
+  if (status) {
+    // Nếu status được truyền vào
+    query.status = status; // Thêm điều kiện lọc theo status
+  }
+  try {
+    const count = await Postings.countDocuments(query);
+    res.status(200).json({ count });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+const countPostsToday = async (req, res, next) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const { status } = req.query; // Lấy giá trị của tham số status từ query string
+  const query = { createdAt: { $gte: today } };
+
+  if (status) {
+    // Nếu status được truyền vào
+    query.status = status; // Thêm điều kiện lọc theo status
+  }
+  try {
+    const count = await Postings.countDocuments(query);
+    res.status(200).json({ count });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
 module.exports = {
   createPosting,
   getAllPostings,
@@ -400,4 +536,8 @@ module.exports = {
   getPostingRejected,
   getAllStatus,
   deletePost,
+  countPostsByMonth,
+  countPostsToday,
+  countPostsByYear,
+  countPosts,
 };
