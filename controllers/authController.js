@@ -85,7 +85,7 @@ const login = async (req, res) => {
           status: true,
         };
 
-        const createdUser = await User.create(newUser);
+        const createdUser = await User.save(newUser);
 
         const payload = {
           id: createdUser.id,
@@ -117,7 +117,7 @@ const login = async (req, res) => {
           status: false,
         };
 
-        await User.create(newUser);
+        await User.save(newUser);
 
         const statusMail = "register";
         const link = "";
