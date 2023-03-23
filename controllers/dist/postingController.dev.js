@@ -13,14 +13,17 @@ var paypal = require("../middlewares/paypal");
 
 var Users = require("../models/user");
 
-var sendEmail = require("../utils/sendmail"); // tạo Redis client instance
+var sendEmail = require("../utils/sendmail");
+
+var _require2 = require("./pushNotification"),
+    sendNotification = _require2.sendNotification; // tạo Redis client instance
 // const client = redis.createClient({
 //   url: process.env.REDIS_URL,
 // });
 
 
 var createPosting = function createPosting(req, res) {
-  var errors, user, hoadon, hoaDonId, post;
+  var errors, post;
   return regeneratorRuntime.async(function createPosting$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
@@ -39,44 +42,20 @@ var createPosting = function createPosting(req, res) {
 
         case 3:
           _context.prev = 3;
-          _context.next = 6;
-          return regeneratorRuntime.awrap(Users.findById(req.user.id));
-
-        case 6:
-          user = _context.sent;
-
-          if (!(user.phoneNumber.length <= 0)) {
-            _context.next = 10;
-            break;
-          }
-
-          res.status(500).json({
-            message: "Please update your phone number"
-          });
-          return _context.abrupt("return");
-
-        case 10:
-          _context.next = 12;
-          return regeneratorRuntime.awrap(paypal.createDraftInvoice(user.fullname, user.email, user.phoneNumber));
-
-        case 12:
-          hoadon = _context.sent;
-          hoaDonId = hoadon.href.split("/")[6]; // Create a new post
-
+          // Create a new post
           post = new Postings({
             title: req.body.title,
             description: req.body.description,
             buildings: req.body.buildings,
             rooms: req.body.rooms,
             userPosting: req.user.id,
-            img: req.body.img,
-            invoiceId: hoaDonId
+            img: req.body.img
           }); // Save the post to the database
 
-          _context.next = 17;
+          _context.next = 7;
           return regeneratorRuntime.awrap(post.save());
 
-        case 17:
+        case 7:
           //delete cache redis
           // const postings = await client.get("postings");
           // if (postings !== null) {
@@ -91,35 +70,58 @@ var createPosting = function createPosting(req, res) {
               post: post
             }
           });
-          _context.next = 23;
+          _context.next = 13;
           break;
 
-        case 20:
-          _context.prev = 20;
+        case 10:
+          _context.prev = 10;
           _context.t0 = _context["catch"](3);
           res.status(500).json({
             status: "Fail",
             messages: _context.t0.message
           });
 
-        case 23:
+        case 13:
         case "end":
           return _context.stop();
       }
     }
-  }, null, null, [[3, 20]]);
+  }, null, null, [[3, 10]]);
 };
 
 var confirmPost = function confirmPost(req, res) {
-  var posting, updatePost;
+  var user, hoadon, hoaDonId, posting, updatePost, statusMail;
   return regeneratorRuntime.async(function confirmPost$(_context2) {
     while (1) {
       switch (_context2.prev = _context2.next) {
         case 0:
           _context2.next = 2;
-          return regeneratorRuntime.awrap(Postings.findById(req.params.id).populate("userPosting"));
+          return regeneratorRuntime.awrap(Users.findById(req.user.id));
 
         case 2:
+          user = _context2.sent;
+
+          if (!(user.phoneNumber.length <= 0)) {
+            _context2.next = 6;
+            break;
+          }
+
+          res.status(500).json({
+            message: "Please update your phone number!"
+          });
+          return _context2.abrupt("return");
+
+        case 6:
+          _context2.next = 8;
+          return regeneratorRuntime.awrap(paypal.createDraftInvoice(user.fullname, user.email, user.phoneNumber));
+
+        case 8:
+          hoadon = _context2.sent;
+          hoaDonId = hoadon.href.split("/")[6];
+          _context2.next = 12;
+          return regeneratorRuntime.awrap(Postings.findById(req.params.id).populate("userPosting"));
+
+        case 12:
           posting = _context2.sent;
 
           if (!posting) {
@@ -128,7 +130,7 @@ var confirmPost = function confirmPost(req, res) {
             });
           }
 
-          _context2.prev = 4;
+          _context2.prev = 14;
 
           if (posting.status == "approved" || posting.status == "pending" || posting.status == "published") {
             res.status(200).json({
@@ -137,40 +139,43 @@ var confirmPost = function confirmPost(req, res) {
           }
 
           posting.status = "pending";
-          _context2.next = 9;
+          posting.invoiceId = hoaDonId;
+          _context2.next = 20;
           return regeneratorRuntime.awrap(posting.save());
 
-        case 9:
+        case 20:
           updatePost = _context2.sent;
-          _context2.next = 12;
-          return regeneratorRuntime.awrap(sendEmail(posting));
+          statusMail = "confirm";
+          _context2.next = 24;
+          return regeneratorRuntime.awrap(sendEmail(statusMail, posting));
 
-        case 12:
+        case 24:
+          sendNotification();
           res.status(200).json({
             message: "Update successful, Please wait for admin to approve",
             data: updatePost
           });
-          _context2.next = 18;
+          _context2.next = 31;
           break;
 
-        case 15:
-          _context2.prev = 15;
-          _context2.t0 = _context2["catch"](4);
+        case 28:
+          _context2.prev = 28;
+          _context2.t0 = _context2["catch"](14);
           res.status(500).json({
             message: "Something went wrong",
             error: _context2.t0.message
           });
 
-        case 18:
+        case 31:
         case "end":
           return _context2.stop();
       }
     }
-  }, null, null, [[4, 15]]);
+  }, null, null, [[14, 28]]);
 };
 
 var approvedPost = function approvedPost(req, res) {
-  var posting, invoiceId, link, updatePost;
+  var posting, invoiceId, link, updatePost, statusMail;
   return regeneratorRuntime.async(function approvedPost$(_context3) {
     while (1) {
       switch (_context3.prev = _context3.next) {
@@ -208,32 +213,33 @@ var approvedPost = function approvedPost(req, res) {
 
         case 13:
           updatePost = _context3.sent;
-          _context3.next = 16;
-          return regeneratorRuntime.awrap(sendEmail(posting, link));
+          statusMail = "approved";
+          _context3.next = 17;
+          return regeneratorRuntime.awrap(sendEmail(statusMail, posting, link));
 
-        case 16:
+        case 17:
           res.status(200).json({
             message: "update successfully",
             data: updatePost,
             link: link
           });
-          _context3.next = 22;
+          _context3.next = 23;
           break;
 
-        case 19:
-          _context3.prev = 19;
+        case 20:
+          _context3.prev = 20;
           _context3.t0 = _context3["catch"](0);
           res.status(500).json({
             message: "Something went wrong",
             error: _context3.t0.message
           });
 
-        case 22:
+        case 23:
         case "end":
           return _context3.stop();
       }
     }
-  }, null, null, [[0, 19]]);
+  }, null, null, [[0, 20]]);
 };
 
 var getAllPostings = function getAllPostings(req, res) {
@@ -289,19 +295,18 @@ var getAllPostings = function getAllPostings(req, res) {
             }
           }); // }
 
-          _context5.next = 15;
+          _context5.next = 14;
           break;
 
         case 11:
           _context5.prev = 11;
           _context5.t0 = _context5["catch"](0);
-          console.log(_context5.t0);
           res.status(500).json({
             status: "Fail",
             messages: _context5.t0.message
           });
 
-        case 15:
+        case 14:
         case "end":
           return _context5.stop();
       }
@@ -323,9 +328,8 @@ var getPostingDraft = function getPostingDraft(req, res) {
 
         case 3:
           postings = _context6.sent;
-          console.log("file: postingController.js:201 ~ getPostingDraft ~ postings:", postings); // Save the fetched data to Redis cache
+          // Save the fetched data to Redis cache
           // client.set("postings", JSON.stringify(postings));
-
           res.status(200).json({
             status: "Success",
             data: {
@@ -333,24 +337,23 @@ var getPostingDraft = function getPostingDraft(req, res) {
             }
           }); // }
 
-          _context6.next = 12;
+          _context6.next = 10;
           break;
 
-        case 8:
-          _context6.prev = 8;
+        case 7:
+          _context6.prev = 7;
           _context6.t0 = _context6["catch"](0);
-          console.log(_context6.t0);
           res.status(500).json({
             status: "Fail",
             messages: _context6.t0.message
           });
 
-        case 12:
+        case 10:
         case "end":
           return _context6.stop();
       }
     }
-  }, null, null, [[0, 8]]);
+  }, null, null, [[0, 7]]);
 };
 
 var getPostingPending = function getPostingPending(req, res) {
@@ -374,19 +377,18 @@ var getPostingPending = function getPostingPending(req, res) {
             }
           }); // }
 
-          _context7.next = 11;
+          _context7.next = 10;
           break;
 
         case 7:
           _context7.prev = 7;
           _context7.t0 = _context7["catch"](0);
-          console.log(_context7.t0);
           res.status(500).json({
             status: "Fail",
             messages: _context7.t0.message
           });
 
-        case 11:
+        case 10:
         case "end":
           return _context7.stop();
       }
@@ -415,19 +417,18 @@ var getPostingApproved = function getPostingApproved(req, res) {
             }
           }); // }
 
-          _context8.next = 11;
+          _context8.next = 10;
           break;
 
         case 7:
           _context8.prev = 7;
           _context8.t0 = _context8["catch"](0);
-          console.log(_context8.t0.message);
           res.status(500).json({
             status: "Fail",
             messages: _context8.t0
           });
 
-        case 11:
+        case 10:
         case "end":
           return _context8.stop();
       }
@@ -456,19 +457,18 @@ var getPostingRejected = function getPostingRejected(req, res) {
             }
           }); // }
 
-          _context9.next = 11;
+          _context9.next = 10;
           break;
 
         case 7:
           _context9.prev = 7;
           _context9.t0 = _context9["catch"](0);
-          console.log(_context9.t0);
           res.status(500).json({
             status: "Fail",
             messages: _context9.t0.message
           });
 
-        case 11:
+        case 10:
         case "end":
           return _context9.stop();
       }
@@ -484,7 +484,7 @@ var getAllStatus = function getAllStatus(req, res) {
         case 0:
           _context10.prev = 0;
           _context10.next = 3;
-          return regeneratorRuntime.awrap(Postings.find().populate("userPosting buildings rooms"));
+          return regeneratorRuntime.awrap(Postings.find().populate("userPosting"));
 
         case 3:
           postings = _context10.sent;
@@ -495,19 +495,18 @@ var getAllStatus = function getAllStatus(req, res) {
             }
           }); // }
 
-          _context10.next = 11;
+          _context10.next = 10;
           break;
 
         case 7:
           _context10.prev = 7;
           _context10.t0 = _context10["catch"](0);
-          console.log(_context10.t0);
           res.status(500).json({
             status: "Fail",
             messages: _context10.t0.message
           });
 
-        case 11:
+        case 10:
         case "end":
           return _context10.stop();
       }
@@ -675,14 +674,14 @@ var updatePosting = function updatePosting(req, res) {
 };
 
 var rejectPost = function rejectPost(req, res) {
-  var posting, hoadonId, updatedPosting;
+  var posting, hoadonId, updatedPosting, statusMail, link;
   return regeneratorRuntime.async(function rejectPost$(_context14) {
     while (1) {
       switch (_context14.prev = _context14.next) {
         case 0:
           _context14.prev = 0;
           _context14.next = 3;
-          return regeneratorRuntime.awrap(Postings.findById(req.params.id));
+          return regeneratorRuntime.awrap(Postings.findById(req.params.id).populate("userPosting"));
 
         case 3:
           posting = _context14.sent;
@@ -708,23 +707,29 @@ var rejectPost = function rejectPost(req, res) {
 
         case 12:
           updatedPosting = _context14.sent;
+          statusMail = "rejected";
+          link = "";
+          _context14.next = 17;
+          return regeneratorRuntime.awrap(sendEmail(statusMail, posting, link));
+
+        case 17:
           res.status(200).json(updatedPosting);
-          _context14.next = 19;
+          _context14.next = 23;
           break;
 
-        case 16:
-          _context14.prev = 16;
+        case 20:
+          _context14.prev = 20;
           _context14.t0 = _context14["catch"](0);
           res.status(400).json({
             message: _context14.t0.message
           });
 
-        case 19:
+        case 23:
         case "end":
           return _context14.stop();
       }
     }
-  }, null, null, [[0, 16]]);
+  }, null, null, [[0, 20]]);
 };
 
 var deletePost = function deletePost(req, res, next) {
@@ -766,23 +771,315 @@ var deletePost = function deletePost(req, res, next) {
           });
 
         case 14:
-          _context15.next = 20;
+          _context15.next = 19;
           break;
 
         case 16:
           _context15.prev = 16;
           _context15.t0 = _context15["catch"](0);
-          console.log(_context15.t0.message);
           res.status(500).json({
             error: _context15.t0
           });
 
-        case 20:
+        case 19:
         case "end":
           return _context15.stop();
       }
     }
   }, null, null, [[0, 16]]);
+};
+
+var countPosts = function countPosts(req, res, next) {
+  var _req$query, year, month, day, status, startOfYear, endOfYear, query, count, startOfMonth, endOfMonth, _query, _count, startOfDay, endOfDay, _query2, _count2;
+
+  return regeneratorRuntime.async(function countPosts$(_context16) {
+    while (1) {
+      switch (_context16.prev = _context16.next) {
+        case 0:
+          _req$query = req.query, year = _req$query.year, month = _req$query.month, day = _req$query.day, status = _req$query.status;
+
+          if (!year) {
+            year = new Date().getFullYear();
+          } // If month is not provided, count for the entire year
+
+
+          if (month) {
+            _context16.next = 19;
+            break;
+          }
+
+          startOfYear = new Date(year, 0, 1);
+          endOfYear = new Date(year, 11, 31);
+          endOfYear.setHours(23, 59, 59, 999);
+          query = {
+            createdAt: {
+              $gte: startOfYear,
+              $lte: endOfYear
+            }
+          };
+
+          if (status) {
+            query.status = status;
+          }
+
+          _context16.prev = 8;
+          _context16.next = 11;
+          return regeneratorRuntime.awrap(Postings.countDocuments(query));
+
+        case 11:
+          count = _context16.sent;
+          res.status(200).json({
+            count: count
+          });
+          _context16.next = 19;
+          break;
+
+        case 15:
+          _context16.prev = 15;
+          _context16.t0 = _context16["catch"](8);
+          console.log(_context16.t0);
+          res.status(500).json({
+            message: "Server Error"
+          });
+
+        case 19:
+          if (!(month && !day)) {
+            _context16.next = 36;
+            break;
+          }
+
+          startOfMonth = new Date(year, month - 1, 1);
+          endOfMonth = new Date(year, month, 0);
+          endOfMonth.setHours(23, 59, 59, 999);
+          _query = {
+            createdAt: {
+              $gte: startOfMonth,
+              $lte: endOfMonth
+            }
+          };
+
+          if (status) {
+            _query.status = status;
+          }
+
+          _context16.prev = 25;
+          _context16.next = 28;
+          return regeneratorRuntime.awrap(Postings.countDocuments(_query));
+
+        case 28:
+          _count = _context16.sent;
+          res.status(200).json({
+            count: _count
+          });
+          _context16.next = 36;
+          break;
+
+        case 32:
+          _context16.prev = 32;
+          _context16.t1 = _context16["catch"](25);
+          console.log(_context16.t1);
+          res.status(500).json({
+            message: "Server Error"
+          });
+
+        case 36:
+          if (!(month && day)) {
+            _context16.next = 53;
+            break;
+          }
+
+          startOfDay = new Date(year, month - 1, day);
+          endOfDay = new Date(year, month - 1, day);
+          endOfDay.setHours(23, 59, 59, 999);
+          _query2 = {
+            createdAt: {
+              $gte: startOfDay,
+              $lte: endOfDay
+            }
+          };
+
+          if (status) {
+            _query2.status = status;
+          }
+
+          _context16.prev = 42;
+          _context16.next = 45;
+          return regeneratorRuntime.awrap(Postings.countDocuments(_query2));
+
+        case 45:
+          _count2 = _context16.sent;
+          res.status(200).json({
+            count: _count2
+          });
+          _context16.next = 53;
+          break;
+
+        case 49:
+          _context16.prev = 49;
+          _context16.t2 = _context16["catch"](42);
+          console.log(_context16.t2);
+          res.status(500).json({
+            message: "Server Error"
+          });
+
+        case 53:
+        case "end":
+          return _context16.stop();
+      }
+    }
+  }, null, null, [[8, 15], [25, 32], [42, 49]]);
+};
+
+var countPostsByMonth = function countPostsByMonth(req, res, next) {
+  var year, month, status, startOfMonth, endOfMonth, query, count;
+  return regeneratorRuntime.async(function countPostsByMonth$(_context17) {
+    while (1) {
+      switch (_context17.prev = _context17.next) {
+        case 0:
+          year = parseInt(req.query.year);
+          month = parseInt(req.query.month);
+          status = req.query.status;
+          startOfMonth = new Date(year, month - 1, 1);
+          endOfMonth = new Date(year, month, 0);
+          endOfMonth.setHours(23, 59, 59, 999);
+          query = {
+            createdAt: {
+              $gte: startOfMonth,
+              $lte: endOfMonth
+            }
+          };
+
+          if (status) {
+            // Nếu status được truyền vào
+            query.status = status; // Thêm điều kiện lọc theo status
+          }
+
+          _context17.prev = 8;
+          _context17.next = 11;
+          return regeneratorRuntime.awrap(Postings.countDocuments(query));
+
+        case 11:
+          count = _context17.sent;
+          res.status(200).json({
+            count: count
+          });
+          _context17.next = 19;
+          break;
+
+        case 15:
+          _context17.prev = 15;
+          _context17.t0 = _context17["catch"](8);
+          console.log(_context17.t0);
+          res.status(500).json({
+            message: "Server Error"
+          });
+
+        case 19:
+        case "end":
+          return _context17.stop();
+      }
+    }
+  }, null, null, [[8, 15]]);
+};
+
+var countPostsByYear = function countPostsByYear(req, res, next) {
+  var year, status, startOfYear, endOfYear, query, count;
+  return regeneratorRuntime.async(function countPostsByYear$(_context18) {
+    while (1) {
+      switch (_context18.prev = _context18.next) {
+        case 0:
+          year = parseInt(req.query.year);
+          status = req.query.status;
+          startOfYear = new Date(year, 0, 1);
+          endOfYear = new Date(year, 11, 31);
+          endOfYear.setHours(23, 59, 59, 999);
+          query = {
+            createdAt: {
+              $gte: startOfYear,
+              $lte: endOfYear
+            }
+          };
+
+          if (status) {
+            // Nếu status được truyền vào
+            query.status = status; // Thêm điều kiện lọc theo status
+          }
+
+          _context18.prev = 7;
+          _context18.next = 10;
+          return regeneratorRuntime.awrap(Postings.countDocuments(query));
+
+        case 10:
+          count = _context18.sent;
+          res.status(200).json({
+            count: count
+          });
+          _context18.next = 18;
+          break;
+
+        case 14:
+          _context18.prev = 14;
+          _context18.t0 = _context18["catch"](7);
+          console.log(_context18.t0);
+          res.status(500).json({
+            message: "Server Error"
+          });
+
+        case 18:
+        case "end":
+          return _context18.stop();
+      }
+    }
+  }, null, null, [[7, 14]]);
+};
+
+var countPostsToday = function countPostsToday(req, res, next) {
+  var today, status, query, count;
+  return regeneratorRuntime.async(function countPostsToday$(_context19) {
+    while (1) {
+      switch (_context19.prev = _context19.next) {
+        case 0:
+          today = new Date();
+          today.setHours(0, 0, 0, 0);
+          status = req.query.status; // Lấy giá trị của tham số status từ query string
+
+          query = {
+            createdAt: {
+              $gte: today
+            }
+          };
+
+          if (status) {
+            // Nếu status được truyền vào
+            query.status = status; // Thêm điều kiện lọc theo status
+          }
+
+          _context19.prev = 5;
+          _context19.next = 8;
+          return regeneratorRuntime.awrap(Postings.countDocuments(query));
+
+        case 8:
+          count = _context19.sent;
+          res.status(200).json({
+            count: count
+          });
+          _context19.next = 16;
+          break;
+
+        case 12:
+          _context19.prev = 12;
+          _context19.t0 = _context19["catch"](5);
+          console.log(_context19.t0);
+          res.status(500).json({
+            message: "Server Error"
+          });
+
+        case 16:
+        case "end":
+          return _context19.stop();
+      }
+    }
+  }, null, null, [[5, 12]]);
 };
 
 module.exports = {
@@ -799,5 +1096,9 @@ module.exports = {
   getPostingApproved: getPostingApproved,
   getPostingRejected: getPostingRejected,
   getAllStatus: getAllStatus,
-  deletePost: deletePost
+  deletePost: deletePost,
+  countPostsByMonth: countPostsByMonth,
+  countPostsToday: countPostsToday,
+  countPostsByYear: countPostsByYear,
+  countPosts: countPosts
 };

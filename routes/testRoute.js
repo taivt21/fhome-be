@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const paypal = require("../middlewares/paypal");
+const Postings = require("../models/posting");
 
 router.get("/invoices", async (req, res) => {
   paypal;
@@ -29,7 +30,8 @@ router.get("/invoices", async (req, res) => {
 
 router.get("/", async (req, res) => {
   try {
-    const response = await paypal.getListInvoices();
+    const response = await paypal.checkPublishedPost();
+
     res.status(200).json({
       msg: "success",
       data: response,

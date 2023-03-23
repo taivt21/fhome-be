@@ -5,6 +5,7 @@ require("dotenv").config();
 const paypal = require("../middlewares/paypal");
 const Users = require("../models/user");
 const sendEmail = require("../utils/sendmail");
+const { sendNotification } = require("./pushNotification");
 // tạo Redis client instance
 // const client = redis.createClient({
 //   url: process.env.REDIS_URL,
@@ -18,23 +19,6 @@ const createPosting = async (req, res) => {
   }
 
   try {
-    const user = await Users.findById(req.user.id);
-
-    if (user.phoneNumber.length <= 0) {
-      res.status(500).json({
-        message: "Please update your phone number",
-      });
-      return;
-    }
-
-    const hoadon = await paypal.createDraftInvoice(
-      user.fullname,
-      user.email,
-      user.phoneNumber
-    );
-
-    const hoaDonId = hoadon.href.split("/")[6];
-
     // Create a new post
     const post = new Postings({
       title: req.body.title,
@@ -43,7 +27,6 @@ const createPosting = async (req, res) => {
       rooms: req.body.rooms,
       userPosting: req.user.id,
       img: req.body.img,
-      invoiceId: hoaDonId,
     });
 
     // Save the post to the database
@@ -70,6 +53,23 @@ const createPosting = async (req, res) => {
   }
 };
 const confirmPost = async (req, res) => {
+  const user = await Users.findById(req.user.id);
+
+  if (user.phoneNumber.length <= 0) {
+    res.status(500).json({
+      message: "Please update your phone number!",
+    });
+    return;
+  }
+
+  const hoadon = await paypal.createDraftInvoice(
+    user.fullname,
+    user.email,
+    user.phoneNumber
+  );
+
+  const hoaDonId = hoadon.href.split("/")[6];
+
   const posting = await Postings.findById(req.params.id).populate(
     "userPosting"
   );
@@ -92,8 +92,13 @@ const confirmPost = async (req, res) => {
     }
 
     posting.status = "pending";
+    posting.invoiceId = hoaDonId;
+
     const updatePost = await posting.save();
-    await sendEmail(posting);
+
+    const statusMail = "confirm";
+    await sendEmail(statusMail, posting);
+    sendNotification();
 
     res.status(200).json({
       message: "Update successful, Please wait for admin to approve",
@@ -130,7 +135,8 @@ const approvedPost = async (req, res) => {
 
     const updatePost = await posting.save();
 
-    await sendEmail(posting, link);
+    const statusMail = "approved";
+    await sendEmail(statusMail, posting, link);
 
     res.status(200).json({
       message: "update successfully",
@@ -165,7 +171,6 @@ const getAllPostings = async (req, res) => {
     });
     // }
   } catch (err) {
-    console.log(err);
     res.status(500).json({
       status: "Fail",
       messages: err.message,
@@ -177,10 +182,6 @@ const getPostingDraft = async (req, res) => {
     const postings = await Postings.find({ status: "draft" }).populate(
       "userPosting"
     );
-    console.log(
-      "file: postingController.js:201 ~ getPostingDraft ~ postings:",
-      postings
-    );
     // Save the fetched data to Redis cache
     // client.set("postings", JSON.stringify(postings));
     res.status(200).json({
@@ -189,7 +190,6 @@ const getPostingDraft = async (req, res) => {
     });
     // }
   } catch (err) {
-    console.log(err);
     res.status(500).json({
       status: "Fail",
       messages: err.message,
@@ -207,7 +207,6 @@ const getPostingPending = async (req, res) => {
     });
     // }
   } catch (err) {
-    console.log(err);
     res.status(500).json({
       status: "Fail",
       messages: err.message,
@@ -225,7 +224,6 @@ const getPostingApproved = async (req, res) => {
     });
     // }
   } catch (err) {
-    console.log(err.message);
     res.status(500).json({
       status: "Fail",
       messages: err,
@@ -243,7 +241,6 @@ const getPostingRejected = async (req, res) => {
     });
     // }
   } catch (err) {
-    console.log(err);
     res.status(500).json({
       status: "Fail",
       messages: err.message,
@@ -252,14 +249,13 @@ const getPostingRejected = async (req, res) => {
 };
 const getAllStatus = async (req, res) => {
   try {
-    const postings = await Postings.find().populate("userPosting buildings rooms");
+    const postings = await Postings.find().populate("userPosting");
     res.status(200).json({
       status: "Success",
       data: { postings },
     });
     // }
   } catch (err) {
-    console.log(err);
     res.status(500).json({
       status: "Fail",
       messages: err.message,
@@ -344,7 +340,9 @@ const updatePosting = async (req, res) => {
 };
 const rejectPost = async (req, res) => {
   try {
-    const posting = await Postings.findById(req.params.id);
+    const posting = await Postings.findById(req.params.id).populate(
+      "userPosting"
+    );
 
     if (!posting) {
       return res.status(404).json({ message: "Post not found" });
@@ -357,6 +355,10 @@ const rejectPost = async (req, res) => {
     posting.status = "rejected";
 
     const updatedPosting = await posting.save();
+
+    const statusMail = "rejected";
+    const link = "";
+    await sendEmail(statusMail, posting, link);
 
     res.status(200).json(updatedPosting);
   } catch (error) {
@@ -377,12 +379,145 @@ const deletePost = async (req, res, next) => {
       });
     }
   } catch (error) {
-    console.log(error.message);
     res.status(500).json({
       error: error,
     });
   }
 };
+
+const countPosts = async (req, res, next) => {
+  var { year, month, day, status } = req.query;
+
+  if (!year) {
+    year = new Date().getFullYear();
+  }
+
+  // If month is not provided, count for the entire year
+  if (!month) {
+    const startOfYear = new Date(year, 0, 1);
+    const endOfYear = new Date(year, 11, 31);
+    endOfYear.setHours(23, 59, 59, 999);
+
+    const query = { createdAt: { $gte: startOfYear, $lte: endOfYear } };
+
+    if (status) {
+      query.status = status;
+    }
+
+    try {
+      const count = await Postings.countDocuments(query);
+      res.status(200).json({ count });
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ message: "Server Error" });
+    }
+  }
+
+  // If month is provided but day is not, count for the entire month
+  if (month && !day) {
+    const startOfMonth = new Date(year, month - 1, 1);
+    const endOfMonth = new Date(year, month, 0);
+    endOfMonth.setHours(23, 59, 59, 999);
+
+    const query = { createdAt: { $gte: startOfMonth, $lte: endOfMonth } };
+
+    if (status) {
+      query.status = status;
+    }
+
+    try {
+      const count = await Postings.countDocuments(query);
+      res.status(200).json({ count });
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ message: "Server Error" });
+    }
+  }
+
+  // If both month and day are provided, count for the specific day
+  if (month && day) {
+    const startOfDay = new Date(year, month - 1, day);
+    const endOfDay = new Date(year, month - 1, day);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const query = { createdAt: { $gte: startOfDay, $lte: endOfDay } };
+
+    if (status) {
+      query.status = status;
+    }
+
+    try {
+      const count = await Postings.countDocuments(query);
+      res.status(200).json({ count });
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ message: "Server Error" });
+    }
+  }
+};
+const countPostsByMonth = async (req, res, next) => {
+  const year = parseInt(req.query.year);
+  const month = parseInt(req.query.month);
+  const status = req.query.status;
+
+  const startOfMonth = new Date(year, month - 1, 1);
+  const endOfMonth = new Date(year, month, 0);
+  endOfMonth.setHours(23, 59, 59, 999);
+
+  const query = { createdAt: { $gte: startOfMonth, $lte: endOfMonth } };
+  if (status) {
+    // Nếu status được truyền vào
+    query.status = status; // Thêm điều kiện lọc theo status
+  }
+  try {
+    const count = await Postings.countDocuments(query);
+    res.status(200).json({ count });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+const countPostsByYear = async (req, res, next) => {
+  const year = parseInt(req.query.year);
+  const status = req.query.status;
+
+  const startOfYear = new Date(year, 0, 1);
+  const endOfYear = new Date(year, 11, 31);
+  endOfYear.setHours(23, 59, 59, 999);
+
+  const query = { createdAt: { $gte: startOfYear, $lte: endOfYear } };
+  if (status) {
+    // Nếu status được truyền vào
+    query.status = status; // Thêm điều kiện lọc theo status
+  }
+  try {
+    const count = await Postings.countDocuments(query);
+    res.status(200).json({ count });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+const countPostsToday = async (req, res, next) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const { status } = req.query; // Lấy giá trị của tham số status từ query string
+  const query = { createdAt: { $gte: today } };
+
+  if (status) {
+    // Nếu status được truyền vào
+    query.status = status; // Thêm điều kiện lọc theo status
+  }
+  try {
+    const count = await Postings.countDocuments(query);
+    res.status(200).json({ count });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
 module.exports = {
   createPosting,
   getAllPostings,
@@ -398,4 +533,8 @@ module.exports = {
   getPostingRejected,
   getAllStatus,
   deletePost,
+  countPostsByMonth,
+  countPostsToday,
+  countPostsByYear,
+  countPosts,
 };

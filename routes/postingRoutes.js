@@ -37,4 +37,15 @@ router.put("/approve/:id", authenticate, postingController.approvedPost);
 // delete post
 router.delete("/delete/:id", authenticate, postingController.deletePost);
 
+//đếm theo ngày tháng năm
+//query (year, month, status (ex: approved, draft,...))
+//status không truyền vào --> get hết status
+router.get("/month", postingController.countPostsByMonth);
+router.get("/today", postingController.countPostsToday);
+router.get("/year", postingController.countPostsByYear);
+
+// query (year, month, date , status) cái nào ko truyền thì lấy hết
+//exp: ko truyền status --> lấy hết status ; ko truyền date --> lấy hết post theo year&month,...
+router.get("/count", postingController.countPosts);
+
 module.exports = router;

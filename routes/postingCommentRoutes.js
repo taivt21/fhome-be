@@ -15,5 +15,5 @@ router.get(
     uploadImage,
     postingCommentController.createPostingComment
   );
-    router.get("/allComment", authenticate,postingCommentController.getAllPostingComment)
+
 module.exports = router;

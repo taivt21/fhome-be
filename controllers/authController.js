@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const serviceAccount = require("../config/serviceAccount.json");
 const User = require("../models/user");
 const admin = require("firebase-admin");
+const sendEmail = require("../utils/sendmail");
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
@@ -10,7 +11,6 @@ const adminEmails = [
   "taivtse151030@fpt.edu.vn",
   "vinhthse151179@fpt.edu.vn",
   "thinhddse151086@fpt.edu.vn",
-  "tuanndse151153@fpt.edu.vn",
 ];
 
 const createAccessToken = (payload) => {
@@ -55,7 +55,6 @@ const login = async (req, res) => {
         status: userLogin.status,
         roleName: userLogin.roleName,
       };
-      console.log(payload);
 
       const accessToken = createAccessToken(payload);
 
@@ -97,7 +96,6 @@ const login = async (req, res) => {
           status: createdUser.status,
           roleName: createdUser.roleName,
         };
-        console.log(payload);
 
         const accessToken = createAccessToken(payload);
 
@@ -121,6 +119,8 @@ const login = async (req, res) => {
 
         await User.create(newUser);
 
+        const statusMail = "register"
+        await sendEmail(statusMail, newUser);
         res.status(400).json({
           status: "Fail",
           messages:

@@ -1,5 +1,6 @@
 require("dotenv").config();
 const axios = require("axios");
+const Postings = require("../models/posting");
 
 //Tạo số thứ tự hóa đơn
 const generatenextInvoiceNumber = async () => {
@@ -19,7 +20,6 @@ const generatenextInvoiceNumber = async () => {
 
     return response.data.invoice_number;
   } catch (error) {
-    // console.log(error);
     return "";
   }
 };
@@ -80,21 +80,21 @@ const createDraftInvoice = async (name, email, phone) => {
           {
             billing_info: {
               name: {
-                given_name: "Stephanie",
-                surname: "Meyers",
+                given_name: "",
+                surname: name,
               },
-              address: {
-                address_line_1: "1234 Main Street",
-                admin_area_2: "Anytown",
-                admin_area_1: "CA",
-                postal_code: "98765",
-                country_code: "US",
-              },
+              // address: {
+              //   address_line_1: "1234 Main Street",
+              //   admin_area_2: "Anytown",
+              //   admin_area_1: "CA",
+              //   postal_code: "98765",
+              //   country_code: "US",
+              // },
               email_address: email,
               phones: [
                 {
-                  country_code: "001",
-                  national_number: "4884551234",
+                  country_code: "084",
+                  national_number: phone,
                   phone_type: "HOME",
                 },
               ],
@@ -104,44 +104,44 @@ const createDraftInvoice = async (name, email, phone) => {
         ],
         items: [
           {
-            name: "Thanh toan post bai",
-            description: "post bai goi super vip",
+            name: "Thanh toan",
+            description: "Thanh toan bai dang",
             quantity: "1",
             unit_amount: {
               currency_code: "USD",
-              value: "50.00",
+              value: "1.00",
             },
             unit_of_measure: "QUANTITY",
           },
         ],
-        configuration: {
-          partial_payment: {
-            allow_partial_payment: true,
-            minimum_amount_due: {
-              currency_code: "USD",
-              value: "20.00",
-            },
-          },
-          allow_tip: true,
-          tax_calculated_after_discount: true,
-          tax_inclusive: false,
-        },
-        amount: {
-          breakdown: {
-            custom: {
-              label: "Packing Charges",
-              amount: {
-                currency_code: "USD",
-                value: "10.00",
-              },
-            },
-            discount: {
-              invoice_discount: {
-                percent: "0",
-              },
-            },
-          },
-        },
+        // configuration: {
+        //   partial_payment: {
+        //     allow_partial_payment: false,
+        //     minimum_amount_due: {
+        //       currency_code: "USD",
+        //       value: "20.00",
+        //     },
+        //   },
+        //   allow_tip: false,
+        //   tax_calculated_after_discount: true,
+        //   tax_inclusive: false,
+        // },
+        // amount: {
+        //   breakdown: {
+        //     custom: {
+        //       label: "Packing Charges",
+        //       amount: {
+        //         currency_code: "USD",
+        //         value: "10.00",
+        //       },
+        //     },
+        //     discount: {
+        //       invoice_discount: {
+        //         percent: "0",
+        //       },
+        //     },
+        //   },
+        // },
       },
       {
         headers: {
@@ -152,7 +152,6 @@ const createDraftInvoice = async (name, email, phone) => {
 
     return response.data;
   } catch (error) {
-    // console.log(error);
   }
 };
 
@@ -183,7 +182,6 @@ async function getAccessToken() {
     );
     return response.data.access_token;
   } catch (error) {
-    console.log(error.message);
     return null;
   }
 }
@@ -207,7 +205,6 @@ async function changeInvoiceStatusToUNPAID(hoadonId) {
     link = response.data.href;
     return link;
   } catch (error) {
-    console.log(error.message);
     return link;
   }
 }
@@ -225,29 +222,10 @@ async function deleteInvoice(invoiceId) {
       },
     });
   } catch (error) {
-    console.log(error);
   }
 }
 
 // lay danh sach hoa don dang
-async function getListInvoices() {
-  const url = `https://api-m.sandbox.paypal.com/v2/invoicing/invoices?&total_required=true&fields=amount`;
-  const token = await getAccessToken();
-  let result = "";
-  try {
-    const response = await axios.get(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    result = response.data;
-    return result;
-  } catch (error) {
-    console.log(error);
-    return result;
-  }
-}
-
 async function getInvoiceDetail(hoadonId) {
   const url = `https://api-m.sandbox.paypal.com/v2/invoicing/invoices/${hoadonId}`;
   const token = await getAccessToken();
@@ -261,7 +239,47 @@ async function getInvoiceDetail(hoadonId) {
     result = response.data;
     return result;
   } catch (error) {
-    console.log(error.message);
+    return result;
+  }
+}
+// lay danh sach hoa don dang
+async function checkPublishedPost() {
+  const url = `https://api-m.sandbox.paypal.com/v2/invoicing/invoices?&total_required=true&fields=amount`;
+  const token = await getAccessToken();
+  try {
+    const response = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const listInvoice = response.data.items;
+
+    for (let i = 0; i < listInvoice.length; i++) {
+      if (listInvoice[i].status === "PAID") {
+        posts = await Postings.findOne({ invoiceId: listInvoice[i].id });
+        if (posts !== null) {
+          const updatePost = posts;
+          updatePost.status = "published";
+          await updatePost.save();        }
+      }
+    }
+    return response.data;
+  } catch (error) {
+  }
+}
+async function getInvoiceDetail(hoadonId) {
+  const url = `https://api-m.sandbox.paypal.com/v2/invoicing/invoices/${hoadonId}`;
+  const token = await getAccessToken();
+  let result = "";
+  try {
+    const response = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    result = response.data;
+    return result;
+  } catch (error) {
     return result;
   }
 }
@@ -272,6 +290,7 @@ module.exports = {
   getAccessToken,
   changeInvoiceStatusToUNPAID,
   deleteInvoice,
-  getListInvoices,
+  checkPublishedPost,
   getInvoiceDetail,
+  checkPublishedPost,
 };

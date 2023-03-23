@@ -49,25 +49,8 @@ const getAllPostingCommentByPost = async (req, res) => {
       });
     }
   };
-  const getAllPostingComment = async (req, res) => {
-    try {
-      const postingComments = await PostingComments.find({ }).populate(
-        "posting userPostingComment"
-      );
-      res.status(200).json({
-        status: "Success",
-        messages: "Get postings successfully!",
-        data: { postingComments },
-      });
-    } catch (err) {
-      res.status(500).json({
-        status: "Fail",
-        messages: err.message,
-      });
-    }
-  };
+  
 module.exports = {
     createPostingComment,
-    getAllPostingCommentByPost,
-    getAllPostingComment
+    getAllPostingCommentByPost
 }

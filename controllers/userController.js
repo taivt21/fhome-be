@@ -1,5 +1,6 @@
 const { default: mongoose } = require("mongoose");
 const User = require("../models/user");
+const sendEmail = require("../utils/sendmail");
 
 // Lấy thông tin tất cả người dùng
 exports.getAllUsers = async (req, res) => {
@@ -131,6 +132,8 @@ exports.setUserStatus = async (req, res) => {
         messages: "User not found or status is not true",
       });
     }
+    const statusMail = "registerSuccess";
+    await sendEmail(statusMail, updatedUser)
     res.status(200).json({
       status: "Success",
       messages: "User status updated successfully!",
@@ -172,3 +175,39 @@ exports.deleteUser = async (req, res) => {
     });
   }
 };
+
+exports.countUsers = async (req, res, next) => {
+  const year = parseInt(req.query.year);
+  const month = parseInt(req.query.month) - 1; // Trừ đi 1 vì tháng trong JS bắt đầu từ 0
+  const day = parseInt(req.query.day);
+  const status = req.query.status;
+
+  var startOfDay, endOfDay;
+  if (year && month && day) { // Nếu truyền vào ngày
+    startOfDay = new Date(year, month, day);
+    endOfDay = new Date(year, month, day);
+    endOfDay.setHours(23, 59, 59, 999);
+  } else if (year && month) { // Nếu truyền vào tháng
+    startOfDay = new Date(year, month, 1);
+    endOfDay = new Date(year, month + 1, 0);
+    endOfDay.setHours(23, 59, 59, 999);
+  } else if (year) { // Nếu truyền vào năm
+    startOfDay = new Date(year, 0, 1);
+    endOfDay = new Date(year, 11, 31);
+    endOfDay.setHours(23, 59, 59, 999);
+  }
+
+  const query = { createdAt: { $gte: startOfDay, $lte: endOfDay }}
+  if (status) { // Nếu status được truyền vào
+    query.status = status; // Thêm điều kiện lọc theo status
+  }
+  
+  try {
+    const count = await User.countDocuments(query);
+    res.status(200).json({ count });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
