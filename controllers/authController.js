@@ -119,8 +119,9 @@ const login = async (req, res) => {
 
         await User.create(newUser);
 
-        const statusMail = "register"
-        await sendEmail(statusMail, newUser);
+        const statusMail = "register";
+        const link = "";
+        await sendEmail(statusMail, newUser, link);
         res.status(400).json({
           status: "Fail",
           messages:
