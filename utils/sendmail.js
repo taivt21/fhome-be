@@ -9,33 +9,6 @@ const sendEmail = async (status, post, order_url) => {
     },
   });
 
-
-
-  if (status == "confirm") {
-    try {
-      const response = await transporter.sendMail(mailUserConfirm);
-    } catch (error) {}
-  } else if (status == "approved") {
-    try {
-      const response = await transporter.sendMail(mailUserApproved);
-    } catch (error) {}
-  } else if (status == "rejected") {
-    try {
-      const response = await transporter.sendMail(mailUserRejected);
-    } catch (error) {}
-  } else if (status == "register") {
-    try {
-      const response = await transporter.sendMail(mailRegister);
-    } catch (error) {}
-  } else if (status == "registerSuccess") {
-    try {
-      const response = await transporter.sendMail(mailRegisterSuccess);
-    } catch (error) {}
-  } else {
-    try {
-      const response = await transporter.sendMail(mailAdmin);
-    } catch (error) {}
-  }
   const mailUserConfirm = {
     from: process.env.EMAIL,
     to: post.userPosting.email,
@@ -73,7 +46,7 @@ const sendEmail = async (status, post, order_url) => {
 
   const mailAdmin = {
     from: process.env.EMAIL,
-    to: "tranvinh2499@gmail.com",
+    to: "vinhthse151179@fpt.edu.vn",
     subject: "Bài đăng mới đang đợi bạn phê duyệt",
     html: `<p>Xin chào Vinh Tran,</p>
     <p>Có bài post mới đang chờ được phê duyệt</p>`,
@@ -81,7 +54,7 @@ const sendEmail = async (status, post, order_url) => {
 
   const mailRegister = {
     from: process.env.EMAIL,
-    to: "tranvinh2499@gmail.com",
+    to: "vinhthse151179@fpt.edu.vn",
     subject: "Có chủ trọ mới đang đợi bạn phê duyệt",
     html: `<p>Xin chào Vinh Tran,</p>
     <p>Có người dùng vừa đăng kí và đang chờ được phê duyệt</p>
@@ -100,6 +73,38 @@ const sendEmail = async (status, post, order_url) => {
     <p>Trân trọng</p>
     <p>Đội ngũ quản trị viên</p>`,
   };
+
+  if (status == "confirm") {
+    try {
+      const response = await transporter.sendMail(mailUserConfirm);
+      console.log(response, "email");
+    } catch (error) {}
+  } else if (status == "approved") {
+    try {
+      const response = await transporter.sendMail(mailUserApproved);
+      console.log(response, "email");
+    } catch (error) {}
+  } else if (status == "rejected") {
+    try {
+      const response = await transporter.sendMail(mailUserRejected);
+      console.log(response, "email");
+    } catch (error) {}
+  } else if (status == "register") {
+    try {
+      const response = await transporter.sendMail(mailRegister);
+      console.log(response, "email");
+    } catch (error) {}
+  } else if (status == "registerSuccess") {
+    try {
+      const response = await transporter.sendMail(mailRegisterSuccess);
+      console.log(response, "email");
+    } catch (error) {}
+  } else {
+    try {
+      const response = await transporter.sendMail(mailAdmin);
+      console.log(response, "email");
+    } catch (error) {}
+  }
 };
 
 module.exports = sendEmail;
