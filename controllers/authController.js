@@ -11,7 +11,6 @@ const adminEmails = [
   "taivtse151030@fpt.edu.vn",
   "vinhthse151179@fpt.edu.vn",
   "thinhddse151086@fpt.edu.vn",
-  "tuanndse151153@fpt.edu.vn",
 ];
 
 const createAccessToken = (payload) => {
