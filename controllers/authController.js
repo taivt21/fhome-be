@@ -39,7 +39,7 @@ const login = async (req, res) => {
       });
       return;
     }
-    
+
     const userLogin = await User.findOne({
       email: googlePayload.email,
       status: true,
@@ -85,7 +85,7 @@ const login = async (req, res) => {
           status: true,
         };
 
-        const createdUser = await User.save(newUser);
+        const createdUser = await User.create(newUser);
 
         const payload = {
           id: createdUser.id,
@@ -117,11 +117,11 @@ const login = async (req, res) => {
           status: false,
         };
 
-        await User.save(newUser);
+        await User.create(newUser);
 
-        const statusMail = "register";
-        const link = "";
-        await sendEmail(statusMail, newUser, link);
+
+        // const statusMail = "register"
+        // await sendEmail(statusMail, newUser);
         res.status(400).json({
           status: "Fail",
           messages:
