@@ -57,7 +57,7 @@ const confirmPost = async (req, res) => {
 
   if (user.phoneNumber.length <= 0) {
     res.status(500).json({
-      message: "Please update your phone number",
+      message: "Please update your phone number!",
     });
     return;
   }

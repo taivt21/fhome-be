@@ -20,7 +20,6 @@ const generatenextInvoiceNumber = async () => {
 
     return response.data.invoice_number;
   } catch (error) {
-    // console.log(error);
     return "";
   }
 };
@@ -81,21 +80,21 @@ const createDraftInvoice = async (name, email, phone) => {
           {
             billing_info: {
               name: {
-                given_name: "Stephanie",
-                surname: "Meyers",
+                given_name: "",
+                surname: name,
               },
-              address: {
-                address_line_1: "1234 Main Street",
-                admin_area_2: "Anytown",
-                admin_area_1: "CA",
-                postal_code: "98765",
-                country_code: "US",
-              },
+              // address: {
+              //   address_line_1: "1234 Main Street",
+              //   admin_area_2: "Anytown",
+              //   admin_area_1: "CA",
+              //   postal_code: "98765",
+              //   country_code: "US",
+              // },
               email_address: email,
               phones: [
                 {
-                  country_code: "001",
-                  national_number: "4884551234",
+                  country_code: "084",
+                  national_number: phone,
                   phone_type: "HOME",
                 },
               ],
@@ -105,44 +104,44 @@ const createDraftInvoice = async (name, email, phone) => {
         ],
         items: [
           {
-            name: "Thanh toan post bai",
-            description: "post bai goi super vip",
+            name: "Thanh toan",
+            description: "Thanh toan bai dang",
             quantity: "1",
             unit_amount: {
               currency_code: "USD",
-              value: "50.00",
+              value: "1.00",
             },
             unit_of_measure: "QUANTITY",
           },
         ],
-        configuration: {
-          partial_payment: {
-            allow_partial_payment: true,
-            minimum_amount_due: {
-              currency_code: "USD",
-              value: "20.00",
-            },
-          },
-          allow_tip: true,
-          tax_calculated_after_discount: true,
-          tax_inclusive: false,
-        },
-        amount: {
-          breakdown: {
-            custom: {
-              label: "Packing Charges",
-              amount: {
-                currency_code: "USD",
-                value: "10.00",
-              },
-            },
-            discount: {
-              invoice_discount: {
-                percent: "0",
-              },
-            },
-          },
-        },
+        // configuration: {
+        //   partial_payment: {
+        //     allow_partial_payment: false,
+        //     minimum_amount_due: {
+        //       currency_code: "USD",
+        //       value: "20.00",
+        //     },
+        //   },
+        //   allow_tip: false,
+        //   tax_calculated_after_discount: true,
+        //   tax_inclusive: false,
+        // },
+        // amount: {
+        //   breakdown: {
+        //     custom: {
+        //       label: "Packing Charges",
+        //       amount: {
+        //         currency_code: "USD",
+        //         value: "10.00",
+        //       },
+        //     },
+        //     discount: {
+        //       invoice_discount: {
+        //         percent: "0",
+        //       },
+        //     },
+        //   },
+        // },
       },
       {
         headers: {
@@ -153,7 +152,6 @@ const createDraftInvoice = async (name, email, phone) => {
 
     return response.data;
   } catch (error) {
-    // console.log(error);
   }
 };
 
@@ -184,7 +182,6 @@ async function getAccessToken() {
     );
     return response.data.access_token;
   } catch (error) {
-    console.log(error.message);
     return null;
   }
 }
@@ -208,7 +205,6 @@ async function changeInvoiceStatusToUNPAID(hoadonId) {
     link = response.data.href;
     return link;
   } catch (error) {
-    console.log(error.message);
     return link;
   }
 }
@@ -226,7 +222,6 @@ async function deleteInvoice(invoiceId) {
       },
     });
   } catch (error) {
-    console.log(error);
   }
 }
 
@@ -244,7 +239,6 @@ async function getInvoiceDetail(hoadonId) {
     result = response.data;
     return result;
   } catch (error) {
-    console.log(error.message);
     return result;
   }
 }
@@ -271,7 +265,6 @@ async function checkPublishedPost() {
     }
     return response.data;
   } catch (error) {
-    console.log(error.message);
   }
 }
 async function getInvoiceDetail(hoadonId) {
@@ -287,7 +280,6 @@ async function getInvoiceDetail(hoadonId) {
     result = response.data;
     return result;
   } catch (error) {
-    console.log(error.message);
     return result;
   }
 }

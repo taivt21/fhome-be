@@ -52,28 +52,54 @@ const sendEmail = async (status, post, order_url) => {
     <p>Có bài post mới đang chờ được phê duyệt</p>`,
   };
 
+  const mailRegister = {
+    from: process.env.EMAIL,
+    to: "vinhthse151179@fpt.edu.vn",
+    subject: "Có chủ trọ mới đang đợi bạn phê duyệt",
+    html: `<p>Xin chào Vinh Tran,</p>
+    <p>Người dùng có email <b> ${post.email} </b> vừa đăng kí và đang chờ được phê duyệt</p>
+    <p>Vui lòng vào xét duyệt</p>
+    <p>Trân trọng</p>
+    <p>Đội ngũ quản trị viên</p>`,
+  };
+
+  const mailRegisterSuccess = {
+    from: process.env.EMAIL,
+    to: post.email,
+    subject: "Chúc mừng bạn được phê duyệt tài khoản",
+    html: `<p>Xin chào ${post.fullname},</p>
+    <p>Chúc mừng bạn với email <b> ${post.email} </b> đã được phê duyệt thành công</p>
+    <p>Hãy vào web và đăng bài nhé!</p>
+    <p>Trân trọng</p>
+    <p>Đội ngũ quản trị viên</p>`,
+  };
+
   if (status == "confirm") {
     try {
       const response = await transporter.sendMail(mailUserConfirm);
       console.log(response, "email");
     } catch (error) {}
-  } 
-  
-  else if (status == "approved") {
+  } else if (status == "approved") {
     try {
       const response = await transporter.sendMail(mailUserApproved);
       console.log(response, "email");
     } catch (error) {}
-  } 
-  
-  else if (status == "rejected") {
+  } else if (status == "rejected") {
     try {
       const response = await transporter.sendMail(mailUserRejected);
       console.log(response, "email");
     } catch (error) {}
-  }
-  
-  else {
+  } else if (status == "register") {
+    try {
+      const response = await transporter.sendMail(mailRegister);
+      console.log(response, "email");
+    } catch (error) {}
+  } else if (status == "registerSuccess") {
+    try {
+      const response = await transporter.sendMail(mailRegisterSuccess);
+      console.log(response, "email");
+    } catch (error) {}
+  } else {
     try {
       const response = await transporter.sendMail(mailAdmin);
       console.log(response, "email");

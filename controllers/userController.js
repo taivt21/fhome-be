@@ -1,5 +1,6 @@
 const { default: mongoose } = require("mongoose");
 const User = require("../models/user");
+const sendEmail = require("../utils/sendmail");
 
 // Lấy thông tin tất cả người dùng
 exports.getAllUsers = async (req, res) => {
@@ -131,6 +132,8 @@ exports.setUserStatus = async (req, res) => {
         messages: "User not found or status is not true",
       });
     }
+    const statusMail = "registerSuccess";
+    await sendEmail(statusMail, updatedUser)
     res.status(200).json({
       status: "Success",
       messages: "User status updated successfully!",
