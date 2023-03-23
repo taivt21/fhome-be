@@ -9,7 +9,7 @@ router.get("/getFavouriteByUser", authenticate, favouriteController.getFavourite
 
 router.get("/getFavouriteByPost/:id", authenticate, favouriteController.getFavouriteByPost);
 
-router.get("/getAllFavourite/:id", authenticate, favouriteController.getFavourite);
+router.get("/getAllFavourite", authenticate, favouriteController.getFavourite);
 
 router.delete("/deleteFavouritePost/:id", authenticate, favouriteController.deleteFavourite);
 
