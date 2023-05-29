@@ -104,7 +104,46 @@ var getAllPostingCommentByPost = function getAllPostingCommentByPost(req, res) {
   }, null, null, [[0, 8]]);
 };
 
+var getAllPostingComment = function getAllPostingComment(req, res) {
+  var postingComments;
+  return regeneratorRuntime.async(function getAllPostingComment$(_context3) {
+    while (1) {
+      switch (_context3.prev = _context3.next) {
+        case 0:
+          _context3.prev = 0;
+          _context3.next = 3;
+          return regeneratorRuntime.awrap(PostingComments.find({}).populate("posting userPostingComment"));
+
+        case 3:
+          postingComments = _context3.sent;
+          res.status(200).json({
+            status: "Success",
+            messages: "Get postings successfully!",
+            data: {
+              postingComments: postingComments
+            }
+          });
+          _context3.next = 10;
+          break;
+
+        case 7:
+          _context3.prev = 7;
+          _context3.t0 = _context3["catch"](0);
+          res.status(500).json({
+            status: "Fail",
+            messages: _context3.t0.message
+          });
+
+        case 10:
+        case "end":
+          return _context3.stop();
+      }
+    }
+  }, null, null, [[0, 7]]);
+};
+
 module.exports = {
   createPostingComment: createPostingComment,
-  getAllPostingCommentByPost: getAllPostingCommentByPost
+  getAllPostingCommentByPost: getAllPostingCommentByPost,
+  getAllPostingComment: getAllPostingComment
 };
